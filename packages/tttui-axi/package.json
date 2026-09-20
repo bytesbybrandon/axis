@@ -5,9 +5,9 @@
   "type": "module",
   "main": "src/game.js",
   "bin": {
-    "tttui": "./bin/ttt.js",
-    "tttui-axi": "./bin/ttt.js",
-    "ttt": "./bin/ttt.js"
+    "tttui": "bin/ttt.js",
+    "tttui-axi": "bin/ttt.js",
+    "ttt": "bin/ttt.js"
   },
   "scripts": {
     "start": "node bin/ttt.js",
