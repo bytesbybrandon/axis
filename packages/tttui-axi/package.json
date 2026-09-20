@@ -1,0 +1,41 @@
+{
+  "name": "tttui-axi",
+  "version": "1.0.0",
+  "description": "Terminal TUI Tic-Tac-Toe and Agent eXperience Interface (AXI) adhering to axi.md",
+  "type": "module",
+  "main": "src/game.js",
+  "bin": {
+    "tttui": "./bin/ttt.js",
+    "tttui-axi": "./bin/ttt.js",
+    "ttt": "./bin/ttt.js"
+  },
+  "scripts": {
+    "start": "node bin/ttt.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "tic-tac-toe",
+    "tui",
+    "terminal-game",
+    "minimax",
+    "axi",
+    "agent-cli",
+    "toon"
+  ],
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bytesbybrandon/tttui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bytesbybrandon/tttui/issues"
+  },
+  "homepage": "https://github.com/bytesbybrandon/tttui#readme",
+  "author": "Brandon (bytesbybrandon)",
+  "license": "MIT"
+}
