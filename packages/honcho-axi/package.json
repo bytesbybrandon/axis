@@ -15,14 +15,19 @@
   "scripts": {
     "axi": "node \"./bin/Honcho AXI-axi.js\"",
     "build": "tsc --noEmit --project tsconfig.json && node ./scripts/build-skill.ts --check",
+    "build:runtime": "tsc --project tsconfig.build.json",
     "build:skill": "node ./scripts/build-skill.ts",
-    "test": "npm run build && node --test"
+    "verify:package": "npm run build:runtime && node ./scripts/verify-package.mjs",
+    "test": "npm run build && npm run build:runtime && node --test"
   },
   "type": "module",
   "files": [
-    "bin",
-    "src",
-    "skills",
+    "bin/Honcho AXI-axi.js",
+    "dist/cli.js",
+    "dist/commands/home.js",
+    "dist/honcho.js",
+    "dist/version.js",
+    "skills/Honcho AXI-axi/SKILL.md",
     "README.md",
     "CONTRIBUTING.md",
     "CODE_OF_CONDUCT.md",
