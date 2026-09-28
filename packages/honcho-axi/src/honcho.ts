@@ -39,7 +39,7 @@ export function runHoncho(args: string[]) {
   });
 
   if (result.error) {
-    const notFound = result.error.code === "ENOENT";
+    const notFound = (result.error as NodeJS.ErrnoException).code === "ENOENT";
     return {
       ok: false,
       code: notFound ? "HONCHO_CLI_NOT_FOUND" : "HONCHO_CLI_FAILED",
