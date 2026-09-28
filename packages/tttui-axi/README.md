@@ -84,6 +84,8 @@ next[3]:
 
 ## 🎮 Interactive TUI Features (For Humans)
 
+<img width="609" height="616" alt="tttui-axi" src="https://github.com/user-attachments/assets/796bd364-3d49-4fcc-bd23-67679eb90685" />
+
 - **Zero Runtime Dependencies**: Standard Node.js library only.
 - **Flicker-Free ANSI TUI**: Clean Unicode box-drawing (`┌─┬─┐`) with vibrant color accents.
 - **Terminal Audio Effects**: Native ANSI bell acoustic cues for move placement, invalid moves, win fanfare, and ties—with an instant mute toggle (`V`).
