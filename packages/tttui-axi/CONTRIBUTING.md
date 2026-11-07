@@ -6,9 +6,11 @@ Thank you for your interest in contributing to `tttui-axi`!
 
 1. **Fork and clone:**
    ```bash
-   git clone https://github.com/bytesbybrandon/tttui.git
-   cd tttui
+   git clone https://github.com/bytesbybrandon/axis.git
+   cd axis/packages/tttui-axi
    ```
+
+   `tttui-axi` lives in the `axis` monorepo. Run `pnpm install` once at the repository root to set up the workspace tooling; the game itself still has no runtime dependencies.
 
 2. **Zero Dependency Setup:**
    This project relies entirely on modern standard Node.js (v18+). No external production dependencies are required.
