@@ -1,0 +1,50 @@
+{
+  "name": "honcho-axi",
+  "version": "0.1.0",
+  "description": "Agent-facing AXI for Honcho",
+  "author": "Brandon (bytesbybrandon)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bytesbybrandon/honcho-axi.git"
+  },
+  "homepage": "https://github.com/bytesbybrandon/honcho-axi#readme",
+  "bugs": {
+    "url": "https://github.com/bytesbybrandon/honcho-axi/issues"
+  },
+  "scripts": {
+    "axi": "node \"./bin/Honcho AXI-axi.js\"",
+    "build": "tsc --noEmit --project tsconfig.json && node ./scripts/build-skill.ts --check",
+    "build:runtime": "tsc --project tsconfig.build.json",
+    "build:skill": "node ./scripts/build-skill.ts",
+    "verify:package": "npm run build:runtime && node ./scripts/verify-package.mjs",
+    "test": "npm run build && npm run build:runtime && node --test"
+  },
+  "type": "module",
+  "files": [
+    "bin/Honcho AXI-axi.js",
+    "dist/cli.js",
+    "dist/commands/home.js",
+    "dist/honcho.js",
+    "dist/version.js",
+    "skills/Honcho AXI-axi/SKILL.md",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "honcho-axi": "./bin/Honcho AXI-axi.js"
+  },
+  "dependencies": {
+    "@toon-format/toon": "^4.1.1",
+    "axi-sdk-js": "^0.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
