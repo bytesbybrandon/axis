@@ -5,21 +5,11 @@ import path from "node:path";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const packageJson = JSON.parse(await readFile(path.join(projectRoot, "package.json"), "utf8"));
-const packageLock = JSON.parse(await readFile(path.join(projectRoot, "package-lock.json"), "utf8"));
-const npmCli = process.env.npm_execpath;
 const keepTarball = process.argv.includes("--keep");
 const cliName = "pagescms-axi";
 
-if (!npmCli) {
-  throw new Error("Run this check through `npm run verify:package` so it uses the current npm CLI.");
-}
-
-if (packageLock.packages?.[""]?.version !== packageJson.version) {
-  throw new Error("package.json and package-lock.json versions must match.");
-}
-
-if (packageJson.bin?.[cliName] !== "./bin/Pages CMS AXI-axi.js") {
-  throw new Error(`The ${cliName} executable must target ./bin/Pages CMS AXI-axi.js.`);
+if (packageJson.bin?.[cliName] !== "./bin/pagescms-axi.js") {
+  throw new Error(`The ${cliName} executable must target ./bin/pagescms-axi.js.`);
 }
 
 const versionSource = await readFile(path.join(projectRoot, "src/version.ts"), "utf8");
@@ -34,7 +24,7 @@ const allowedFiles = new Set([
   "CONTRIBUTING.md",
   "LICENSE",
   "README.md",
-  "bin/Pages CMS AXI-axi.js",
+  "bin/pagescms-axi.js",
   "dist/cli.js",
   "dist/commands/config.js",
   "dist/commands/home.js",
@@ -44,11 +34,12 @@ const allowedFiles = new Set([
   "dist/pages.js",
   "dist/version.js",
   "package.json",
-  "skills/Pages CMS AXI-axi/SKILL.md",
+  "skills/pagescms-axi/SKILL.md",
 ]);
 
 function runNpm(args, { capture = false, cwd = projectRoot } = {}) {
-  const result = spawnSync(process.execPath, [npmCli, ...args], {
+  const result = spawnSync("npm", args, {
+    shell: process.platform === "win32",
     cwd,
     encoding: "utf8",
     stdio: capture ? "pipe" : "inherit",

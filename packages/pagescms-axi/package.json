@@ -6,23 +6,24 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bytesbybrandon/pagescms-axi.git"
+    "url": "git+https://github.com/bytesbybrandon/axis.git",
+    "directory": "packages/pagescms-axi"
   },
-  "homepage": "https://github.com/bytesbybrandon/pagescms-axi#readme",
+  "homepage": "https://github.com/bytesbybrandon/axis/tree/main/packages/pagescms-axi#readme",
   "bugs": {
-    "url": "https://github.com/bytesbybrandon/pagescms-axi/issues"
+    "url": "https://github.com/bytesbybrandon/axis/issues"
   },
   "scripts": {
-    "axi": "node \"./bin/Pages CMS AXI-axi.js\"",
+    "axi": "node \"./bin/pagescms-axi.js\"",
     "build": "tsc --noEmit --project tsconfig.json && node ./scripts/build-skill.ts --check",
     "build:runtime": "tsc --project tsconfig.build.json",
     "build:skill": "node ./scripts/build-skill.ts",
-    "verify:package": "npm run build:runtime && node ./scripts/verify-package.mjs",
+    "verify:package": "npm run build:runtime && node ./scripts/verify-package.mjs && node ../../tools/axis/verify-tarball.mjs",
     "test": "npm run build && npm run build:runtime && node --test"
   },
   "type": "module",
   "files": [
-    "bin/Pages CMS AXI-axi.js",
+    "bin/pagescms-axi.js",
     "dist/cli.js",
     "dist/commands/config.js",
     "dist/commands/home.js",
@@ -31,14 +32,14 @@
     "dist/github.js",
     "dist/pages.js",
     "dist/version.js",
-    "skills/Pages CMS AXI-axi/SKILL.md",
+    "skills/pagescms-axi/SKILL.md",
     "README.md",
     "CONTRIBUTING.md",
     "CODE_OF_CONDUCT.md",
     "LICENSE"
   ],
   "bin": {
-    "pagescms-axi": "./bin/Pages CMS AXI-axi.js"
+    "pagescms-axi": "./bin/pagescms-axi.js"
   },
   "engines": {
     "node": ">=22.18.0"

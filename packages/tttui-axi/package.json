@@ -11,7 +11,8 @@
   },
   "scripts": {
     "start": "node bin/ttt.js",
-    "test": "node --test"
+    "test": "node --test",
+    "verify:package": "node ../../tools/axis/verify-tarball.mjs --smoke --help"
   },
   "keywords": [
     "tic-tac-toe",
@@ -30,12 +31,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bytesbybrandon/tttui.git"
+    "url": "git+https://github.com/bytesbybrandon/axis.git",
+    "directory": "packages/tttui-axi"
   },
   "bugs": {
-    "url": "https://github.com/bytesbybrandon/tttui/issues"
+    "url": "https://github.com/bytesbybrandon/axis/issues"
   },
-  "homepage": "https://github.com/bytesbybrandon/tttui#readme",
+  "homepage": "https://github.com/bytesbybrandon/axis/tree/main/packages/tttui-axi#readme",
   "author": "Brandon (bytesbybrandon)",
   "license": "MIT"
 }

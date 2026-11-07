@@ -1,6 +1,5 @@
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
-import { homedir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import { createSkillMarkdown } from "../src/skill.ts";
 
 const SKILL_NAME = "google-adk-axi";
@@ -11,7 +10,7 @@ if (unexpectedArguments.length > 0) {
   throw new Error(`Unknown option: ${unexpectedArguments[0]}`);
 }
 
-const destination = await getSkillDestination();
+const destination = resolve(import.meta.dirname, "..", "skills", SKILL_NAME, "SKILL.md");
 const generated = createSkillMarkdown();
 
 if (checkOnly) {
@@ -33,31 +32,6 @@ if (checkOnly) {
   await mkdir(dirname(destination), { recursive: true });
   await writeFile(destination, generated, "utf8");
   process.stdout.write(`Wrote skill pointer: ${destination}\n`);
-}
-
-async function getSkillDestination(): Promise<string> {
-  const registryPath = join(homedir(), ".agents", "sources.json");
-  try {
-    const registry = JSON.parse(await readFile(registryPath, "utf8")) as { sources?: unknown };
-    if (Array.isArray(registry.sources)) {
-      for (const source of registry.sources) {
-        if (typeof source !== "string") continue;
-        const expanded = source.startsWith("~/") || source.startsWith("~\\")
-          ? join(homedir(), source.slice(2))
-          : resolve(source);
-        try {
-          await access(expanded);
-          return join(expanded, SKILL_NAME, "SKILL.md");
-        } catch {
-          continue;
-        }
-      }
-    }
-  } catch (error) {
-    if (errorCode(error) !== "ENOENT") throw error;
-  }
-
-  return join(homedir(), ".agents", "skills", SKILL_NAME, "SKILL.md");
 }
 
 function errorCode(error: unknown): string | undefined {

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { parseArguments, resolvePagesContext } from "../src/context.ts";
 import { repositoryContentsEndpoint } from "../src/github.ts";
 
-const entrypoint = fileURLToPath(new URL("../bin/Pages CMS AXI-axi.js", import.meta.url));
+const entrypoint = fileURLToPath(new URL("../bin/pagescms-axi.js", import.meta.url));
 
 test("parses long, short, and inline repository options", () => {
   assert.deepEqual(parseArguments(["list", "-R", "owner/repo", "--branch=preview"]), {

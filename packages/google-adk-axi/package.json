@@ -6,11 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bytesbybrandon/google-adk-axi.git"
+    "url": "git+https://github.com/bytesbybrandon/axis.git",
+    "directory": "packages/google-adk-axi"
   },
-  "homepage": "https://github.com/bytesbybrandon/google-adk-axi#readme",
+  "homepage": "https://github.com/bytesbybrandon/axis/tree/main/packages/google-adk-axi#readme",
   "bugs": {
-    "url": "https://github.com/bytesbybrandon/google-adk-axi/issues"
+    "url": "https://github.com/bytesbybrandon/axis/issues"
   },
   "type": "module",
   "engines": {
@@ -23,7 +24,7 @@
     "axi": "node ./bin/google-adk-axi.js",
     "build": "tsc --project tsconfig.json",
     "build:skill": "tsx scripts/build-skill.ts",
-    "verify:package": "npm run build && node scripts/verify-package.mjs",
+    "verify:package": "npm run build && node scripts/verify-package.mjs && node ../../tools/axis/verify-tarball.mjs",
     "test": "npm run build && node --test"
   },
   "files": [

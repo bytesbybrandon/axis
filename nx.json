@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "targetDefaults": {
+    "build": { "cache": false },
+    "test": { "cache": false },
+    "verify:package": { "cache": false, "dependsOn": ["build"] }
+  }
+}

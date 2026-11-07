@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { normalizeListData, runHoncho } from "../src/honcho.ts";
 
-const entrypoint = fileURLToPath(new URL("../bin/Honcho AXI-axi.js", import.meta.url));
+const entrypoint = fileURLToPath(new URL("../bin/honcho-axi.js", import.meta.url));
 
 test("normalizes list arrays with a count and empty-state message", () => {
   assert.deepEqual(normalizeListData([]), {

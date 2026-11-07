@@ -6,35 +6,36 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bytesbybrandon/honcho-axi.git"
+    "url": "git+https://github.com/bytesbybrandon/axis.git",
+    "directory": "packages/honcho-axi"
   },
-  "homepage": "https://github.com/bytesbybrandon/honcho-axi#readme",
+  "homepage": "https://github.com/bytesbybrandon/axis/tree/main/packages/honcho-axi#readme",
   "bugs": {
-    "url": "https://github.com/bytesbybrandon/honcho-axi/issues"
+    "url": "https://github.com/bytesbybrandon/axis/issues"
   },
   "scripts": {
-    "axi": "node \"./bin/Honcho AXI-axi.js\"",
+    "axi": "node \"./bin/honcho-axi.js\"",
     "build": "tsc --noEmit --project tsconfig.json && node ./scripts/build-skill.ts --check",
     "build:runtime": "tsc --project tsconfig.build.json",
     "build:skill": "node ./scripts/build-skill.ts",
-    "verify:package": "npm run build:runtime && node ./scripts/verify-package.mjs",
+    "verify:package": "npm run build:runtime && node ./scripts/verify-package.mjs && node ../../tools/axis/verify-tarball.mjs",
     "test": "npm run build && npm run build:runtime && node --test"
   },
   "type": "module",
   "files": [
-    "bin/Honcho AXI-axi.js",
+    "bin/honcho-axi.js",
     "dist/cli.js",
     "dist/commands/home.js",
     "dist/honcho.js",
     "dist/version.js",
-    "skills/Honcho AXI-axi/SKILL.md",
+    "skills/honcho-axi/SKILL.md",
     "README.md",
     "CONTRIBUTING.md",
     "CODE_OF_CONDUCT.md",
     "LICENSE"
   ],
   "bin": {
-    "honcho-axi": "./bin/Honcho AXI-axi.js"
+    "honcho-axi": "./bin/honcho-axi.js"
   },
   "dependencies": {
     "@toon-format/toon": "^4.1.1",

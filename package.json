@@ -1,0 +1,19 @@
+{
+  "name": "axis",
+  "private": true,
+  "description": "Monorepo for the bytesbybrandon Agent eXperience Interfaces (AXIs)",
+  "license": "MIT",
+  "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "verify": "nx run-many -t build test verify:package",
+    "changeset": "changeset"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "1.0.1",
+    "@changesets/cli": "3.0.3",
+    "nx": "23.3.1"
+  }
+}

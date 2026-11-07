@@ -5,17 +5,7 @@ import path from "node:path";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
 const packageJson = JSON.parse(await readFile(path.join(projectRoot, "package.json"), "utf8"));
-const packageLock = JSON.parse(await readFile(path.join(projectRoot, "package-lock.json"), "utf8"));
-const npmCli = process.env.npm_execpath;
 const keepTarball = process.argv.includes("--keep");
-
-if (!npmCli) {
-  throw new Error("Run this check through `npm run verify:package` so it uses the current npm CLI.");
-}
-
-if (packageLock.packages?.[""]?.version !== packageJson.version) {
-  throw new Error("package.json and package-lock.json versions must match.");
-}
 
 if (packageJson.bin?.["google-adk-axi"] !== "./bin/google-adk-axi.js") {
   throw new Error("The google-adk-axi executable must target ./bin/google-adk-axi.js.");
@@ -49,7 +39,8 @@ const allowedFiles = new Set([
 ]);
 
 function runNpm(args, { capture = false, cwd = projectRoot } = {}) {
-  const result = spawnSync(process.execPath, [npmCli, ...args], {
+  const result = spawnSync("npm", args, {
+    shell: process.platform === "win32",
     cwd,
     encoding: "utf8",
     stdio: capture ? "pipe" : "inherit",

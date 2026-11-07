@@ -1,0 +1,27 @@
+packages:
+  - packages/*
+
+allowBuilds:
+  nx: true
+  esbuild: true
+
+# Hold new dependency releases for 7 days before they can be installed.
+minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - axi-sdk-js
+
+# Dev-only patches for Nx's own dependencies (Nx pins undici exactly). Drop them once an
+# Nx 23 release ships with fixed versions.
+overrides:
+  undici@7: ^7.30.1
+  brace-expansion@5: ^5.0.12
+
+auditConfig:
+  # reactive-skills-axi forwards to an exact @reactive-skills/axi release. Its upstream
+  # dependency ranges (@toon-format/toon ^1, zod ^3 through @reactive-skills/runtime) still
+  # resolve to these advisories in every release up to 0.21.0, so they are fixed in the
+  # Reactive-Skills/reactive-skills repository, not here. Remove each entry once a pinned
+  # upstream release no longer resolves to it.
+  ignoreGhsas:
+    - GHSA-p95v-992w-h6c3 # @toon-format/toon <2.3.1 via @reactive-skills/axi
+    - GHSA-mrhx-c7xc-m3w5 # zod <4.6.6 via @reactive-skills/runtime

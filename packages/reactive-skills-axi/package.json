@@ -8,7 +8,8 @@
   },
   "files": [
     "bin",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "dependencies": {
     "@reactive-skills/axi": "0.19.0"
@@ -19,10 +20,18 @@
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Reactive-Skills/reactive-skills.git"
+    "url": "git+https://github.com/bytesbybrandon/axis.git",
+    "directory": "packages/reactive-skills-axi"
   },
-  "homepage": "https://reactive-skills.com",
+  "homepage": "https://github.com/bytesbybrandon/axis/tree/main/packages/reactive-skills-axi#readme",
   "publishConfig": {
     "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/bytesbybrandon/axis/issues"
+  },
+  "scripts": {
+    "test": "node --test",
+    "verify:package": "node ../../tools/axis/verify-tarball.mjs --smoke --version"
   }
 }

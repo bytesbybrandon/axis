@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { createSkillMarkdown } from "../src/skill.ts";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const outputPath = resolve(projectRoot, "skills", "Pages CMS AXI-axi", "SKILL.md");
+const outputPath = resolve(projectRoot, "skills", "pagescms-axi", "SKILL.md");
 const expected = createSkillMarkdown();
 const checkOnly = process.argv.includes("--check");
 
