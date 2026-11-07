@@ -1,0 +1,55 @@
+{
+  "name": "pagescms-axi",
+  "version": "0.1.0",
+  "description": "Agent-facing AXI for Pages CMS repositories",
+  "author": "Brandon (bytesbybrandon)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bytesbybrandon/pagescms-axi.git"
+  },
+  "homepage": "https://github.com/bytesbybrandon/pagescms-axi#readme",
+  "bugs": {
+    "url": "https://github.com/bytesbybrandon/pagescms-axi/issues"
+  },
+  "scripts": {
+    "axi": "node \"./bin/Pages CMS AXI-axi.js\"",
+    "build": "tsc --noEmit --project tsconfig.json && node ./scripts/build-skill.ts --check",
+    "build:runtime": "tsc --project tsconfig.build.json",
+    "build:skill": "node ./scripts/build-skill.ts",
+    "verify:package": "npm run build:runtime && node ./scripts/verify-package.mjs",
+    "test": "npm run build && npm run build:runtime && node --test"
+  },
+  "type": "module",
+  "files": [
+    "bin/Pages CMS AXI-axi.js",
+    "dist/cli.js",
+    "dist/commands/config.js",
+    "dist/commands/home.js",
+    "dist/content.js",
+    "dist/context.js",
+    "dist/github.js",
+    "dist/pages.js",
+    "dist/version.js",
+    "skills/Pages CMS AXI-axi/SKILL.md",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "pagescms-axi": "./bin/Pages CMS AXI-axi.js"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "dependencies": {
+    "@toon-format/toon": "^4.1.1",
+    "axi-sdk-js": "^0.1.12",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  }
+}
