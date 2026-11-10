@@ -1,3 +1,5 @@
 node_modules/
 .nx/
 *.tgz
+dist/
+.astro/

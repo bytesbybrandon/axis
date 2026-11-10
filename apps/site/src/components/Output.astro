@@ -1,0 +1,26 @@
+---
+import type { Axi } from '../lib/catalog';
+import { highlight } from '../lib/highlight';
+
+interface Props {
+  axi: Axi;
+}
+const { axi } = Astro.props;
+const view = axi.home;
+---
+{view && (
+  <>
+    <p class="well__cmd">
+      <span class="well__prompt" aria-hidden="true">$</span>
+      <code>{axi.install}</code>
+      <button class="copy" type="button" data-copy={axi.install}>Copy</button>
+    </p>
+    <pre class="out" tabindex="0" aria-label={`Output of ${axi.name} with no arguments`}><code set:html={highlight(view.text)} /></pre>
+    <p class="well__note">
+      {axi.homeStale
+        ? `Captured at v${view.version}; the package is now v${axi.version}. `
+        : `Captured at v${view.version} in an empty folder. `}
+      Machine paths show as &lt;path&gt;.
+    </p>
+  </>
+)}

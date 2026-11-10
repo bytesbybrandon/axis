@@ -1,0 +1,46 @@
+---
+import '@fontsource-variable/funnel-display';
+import '@fontsource-variable/hanken-grotesk';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/site.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { absolute, href } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+}
+const { title, description, path = '' } = Astro.props;
+const canonical = absolute(path, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={href('favicon.svg')} type="image/svg+xml" />
+    <link rel="alternate" type="text/plain" href={href('llms.txt')} title="llms.txt" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#f88a2f" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>

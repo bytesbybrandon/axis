@@ -1,0 +1,17 @@
+---
+import { href } from '../lib/site';
+import { REPO } from '../lib/catalog';
+---
+<header class="nav">
+  <div class="container nav__row">
+    <a class="wordmark" href={href()} aria-label="axis, home">axis</a>
+    <nav aria-label="Primary">
+      <ul class="nav__links">
+        <li><a href={href('#list')}>AXIs</a></li>
+        <li><a href={href('#agents')}>Agents</a></li>
+        <li><a href={href('#add')}>Add one</a></li>
+        <li><a href={REPO}>GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>

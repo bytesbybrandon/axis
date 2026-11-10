@@ -1,0 +1,22 @@
+{
+  "google-adk-axi": {
+    "version": "0.1.0",
+    "text": "bin: <path>\ndescription: Agent interface for local Google ADK Python projects.\nworkspace: <cwd>\nprojects_found: 0\nprojects_message: 0 items found\nprojects: []\nnext_step: Run `google-adk-axi projects list --root <path>` to scan another directory or create a project\nhelp[3]: \"Run `google-adk-axi projects list [--root <path>]` to list projects\",Run `google-adk-axi projects inspect <path>` to inspect one directory,\"Run `google-adk-axi projects create <name> [--root <path>]` to create a project\""
+  },
+  "honcho-axi": {
+    "version": "0.1.0",
+    "text": "bin: <path>\ndescription: \"Inspect and manage Honcho workspaces, peers, sessions, and memory.\"\nservice: Honcho\nstatus: unavailable\nselected_workspace: null\nhealth:\n  ok: false\n  code: HONCHO_CLI_NOT_FOUND\n  message: Honcho CLI was not found. Install honcho-cli and run honcho init.\nworkspaces:\n  ok: false\n  code: HONCHO_CLI_NOT_FOUND\n  message: Honcho CLI was not found. Install honcho-cli and run honcho init.\nnext_step: \"Install honcho-cli, run honcho init, then rerun honcho-axi.\"\nhelp[3]: Run `honcho-axi peer list -w <workspace>` to list peers.,Run `honcho-axi session list -w <workspace>` to list sessions.,Install honcho-cli and run `honcho init` if the CLI is unavailable."
+  },
+  "pagescms-axi": {
+    "version": "0.1.0",
+    "text": "bin: <path>\ndescription: Inspect and manage Pages CMS content stored in GitHub repositories.\nservice: Pages CMS\nstatus: needs_repository\nrepository: null\nbranch: default\ncollections: []\ncount: 0\nmessage: 0 items found\nnext_step: Set PAGESCMS_REPOSITORY=OWNER/REPO or pass --repo OWNER/REPO.\nhelp[2]: Run `pagescms-axi collection list --repo OWNER/REPO` to inspect configured content.,Run `pagescms-axi content list --repo OWNER/REPO --collection NAME` to list entries."
+  },
+  "reactive-skills-axi": {
+    "version": "0.19.0",
+    "text": "bin: <path>\ndescription: AXI-compliant CLI for Reactive Skills Architecture — state, emit, events in TOON format\ncount: 0 skills total\nhelp[5]:\nRun `reactive-skills-axi init <name>` to scaffold a new reactive skill\n  Run `reactive-skills-axi inspect <path>` to inspect a skill statechart\n  Run `reactive-skills-axi events` to tail recent events\n  Run `reactive-skills-axi dashboard` to monitor multiple jobs through one broker\n  Run `reactive-skills-axi reset <skill>` to clear a prior skill run"
+  },
+  "tttui-axi": {
+    "version": "1.0.0",
+    "text": "status:\n  board: \". . . / . . . / . . .\"\n  turn: X\n  mode: pve\n  difficulty: unbeatable\n  round: 1\n  game_state: playing\n  available_moves: [0, 1, 2, 3, 4, 5, 6, 7, 8] (9 remaining)\n  scores: X:0 O:0 ties:0\nnext[3]:\n  Run `tttui move <0-8>` to place mark (choices: 0, 1, 2, 3, 4, 5, 6, 7, 8)\n  Run `tttui ai` to trigger computer move\n  Run `tttui reset` to restart game"
+  }
+}

@@ -1,9 +1,11 @@
 packages:
   - packages/*
+  - apps/*
 
 allowBuilds:
   nx: true
   esbuild: true
+  sharp: false
 
 # Hold new dependency releases for 7 days before they can be installed.
 minimumReleaseAge: 10080

@@ -1,0 +1,21 @@
+---
+import { href } from '../lib/site';
+import { REPO } from '../lib/catalog';
+---
+<footer class="foot">
+  <div class="container foot__row">
+    <div class="foot__about">
+      <a class="wordmark" href={href()} aria-label="axis, home">axis</a>
+      <p>AXIs by bytesbybrandon. The workspace is MIT; each package carries its own license.</p>
+    </div>
+    <nav aria-label="Elsewhere">
+      <ul class="foot__links">
+        <li><a href={REPO}>Source on GitHub</a></li>
+        <li><a href="https://axi.md">axi.md, the principles</a></li>
+        <li><a href={href('llms.txt')}>llms.txt</a></li>
+        <li><a href={href('catalog.toon.txt')}>catalog.toon.txt</a></li>
+        <li><a href={href('catalog.json')}>catalog.json</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
