@@ -1,0 +1,21 @@
+{
+  "google-adk-axi": {
+    "tags": ["agent-frameworks"],
+    "wraps": { "name": "Google ADK", "url": "https://github.com/google/adk-python" }
+  },
+  "honcho-axi": {
+    "tags": ["agent-memory"],
+    "wraps": { "name": "Honcho", "url": "https://honcho.dev" }
+  },
+  "pagescms-axi": {
+    "tags": ["content"],
+    "wraps": { "name": "Pages CMS", "url": "https://pagescms.org" }
+  },
+  "reactive-skills-axi": {
+    "tags": ["agent-skills"],
+    "wraps": { "name": "Reactive Skills", "url": "https://github.com/Reactive-Skills/reactive-skills" }
+  },
+  "tttui-axi": {
+    "tags": ["games"]
+  }
+}

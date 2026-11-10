@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import { href } from '../lib/site';
+---
+<Base title="Not found: axis" description="This page does not exist.">
+  <section class="band">
+    <div class="container notfound">
+      <h1>No such page.</h1>
+      <p class="lead">It may have moved. The roster lists every AXI.</p>
+      <p><a class="btn" href={href('#list')}>Open the roster</a></p>
+    </div>
+  </section>
+</Base>

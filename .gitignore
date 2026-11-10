@@ -1,6 +1,8 @@
 node_modules/
 .nx/
 *.tgz
+dist/
+.astro/
 
 # Personal agent, editor, and environment files that should never ship
 .claude/

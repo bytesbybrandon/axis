@@ -8,6 +8,12 @@ Each package is versioned and published to npm independently; package names and 
 
 ---
 
+The catalog site lives in [`apps/site`](apps/site) (Astro, static).
+It is generated from `packages/*`, so adding a package adds its page, its row and its entry in `llms.txt`, `catalog.json` and `catalog.toon.txt`.
+Merging to `main` publishes it to GitHub Pages through `.github/workflows/pages.yml`.
+
+Licenses are per package: each package directory carries its own `LICENSE`, and that file governs the package.
+The root `LICENSE` (MIT) covers the workspace tooling outside `packages/`.
 ### Key Features
 
 * **[`tttui-axi`](packages/tttui-axi):** terminal tic-tac-toe with an interactive TUI and a compact TOON agent interface (`tttui`, `tttui-axi`, `ttt`), published as [`tttui-axi`](https://www.npmjs.com/package/tttui-axi) under MIT.
@@ -77,6 +83,20 @@ Without cloning, run any published package with `npx`:
 npx -y tttui-axi status
 ```
 
+Site:
+
+```sh
+pnpm --filter @axis/site dev                  # local preview at /axis/
+pnpm --filter @axis/site build                # static output in apps/site/dist
+pnpm --filter @axis/site capture [name...]    # re-record each AXI's no-argument output into src/data/home.json
+```
+
+`capture` runs the built package in an empty sandbox, so build packages first (`pnpm exec nx run-many -t build`).
+Re-capture after a package changes what it prints; the site build warns when a snapshot is missing or from an older version.
+Tags and the project an AXI wraps are optional and live in `apps/site/src/data/meta.json`.
+The site is private and needs Node.js 22.23.4 or later (Astro 7), so CI builds it on Node 24 only; the published packages still support 22.18.
+
+`verify:package` packs each package and checks the tarball: allowed files, no CR line endings, no spaces in paths, executable LF bins, the packed `LICENSE`, and an installed-tarball smoke run.
 Prints the current board, turn and available moves as compact TOON.
 Each package's commands and options are documented in its README, linked in [Key Features](#key-features).
 

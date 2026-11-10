@@ -1,0 +1,69 @@
+---
+import Base from '../../layouts/Base.astro';
+import Output from '../../components/Output.astro';
+import { loadCatalog, suggestedCommands } from '../../lib/catalog';
+import { axiDoc, toToon } from '../../lib/docs';
+import { highlight } from '../../lib/highlight';
+import { renderReadme } from '../../lib/readme';
+import { absolute, href } from '../../lib/site';
+
+export function getStaticPaths() {
+  return loadCatalog().map((axi) => ({ params: { slug: axi.name }, props: { axi } }));
+}
+
+const { axi } = Astro.props;
+const readme = await renderReadme(axi.readme, axi.repoUrl);
+const toon = toToon(axiDoc(axi, (p) => absolute(p, Astro.site))).trimEnd();
+const moves = axi.home ? suggestedCommands(axi.home.text) : [];
+---
+<Base title={`${axi.name}: ${axi.description}`} description={axi.description} path={`axi/${axi.name}/`}>
+  <article>
+    <header class="hello">
+      <div class="container hello__grid">
+        <div>
+          <p class="crumb"><a href={href('#list')}>All AXIs</a></p>
+          <h1 class="hello__name">{axi.name}</h1>
+          <p class="lead">{axi.description}</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Version</dt><dd class="num">{axi.version}</dd></div>
+          <div><dt>License</dt><dd>{axi.license}</dd></div>
+          <div><dt>Commands</dt><dd class="num">{axi.bins.join(', ')}</dd></div>
+          {axi.wraps && <div><dt>Wraps</dt><dd><a href={axi.wraps.url}>{axi.wraps.name}</a></dd></div>}
+          <div><dt>Links</dt><dd><a href={axi.npmUrl}>npm</a>, <a href={axi.repoUrl}>source</a></dd></div>
+        </dl>
+      </div>
+    </header>
+
+    {axi.home && (
+      <section class="band" aria-labelledby="bare-title">
+        <div class="container bare">
+          <div class="bare__copy">
+            <h2 id="bare-title">Run it with no arguments</h2>
+            <p>{moves.length} next {moves.length === 1 ? 'move' : 'moves'} in the output, each a command the agent can run.</p>
+          </div>
+          <div class="well">
+            <div class="well__panel"><Output axi={axi} /></div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <section class="band band--tint" aria-labelledby="readme-title">
+      <div class="container prose-wrap">
+        <h2 id="readme-title">README</h2>
+        <div class="prose" set:html={readme} />
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="record-title">
+      <div class="container bare">
+        <div class="bare__copy">
+          <h2 id="record-title">The record agents read</h2>
+          <p><a href={href(`axi/${axi.name}.toon.txt`)}>Open the file</a>. It is the same facts as this page, in TOON.</p>
+        </div>
+        <div class="well"><pre class="out" tabindex="0" aria-label={`${axi.name} record in TOON`}><code set:html={highlight(toon)} /></pre></div>
+      </div>
+    </section>
+  </article>
+</Base>

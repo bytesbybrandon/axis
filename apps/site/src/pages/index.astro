@@ -1,0 +1,156 @@
+---
+import Base from '../layouts/Base.astro';
+import Output from '../components/Output.astro';
+import { allTags, loadCatalog, suggestedCommands } from '../lib/catalog';
+import { highlight } from '../lib/highlight';
+import { registryDoc, toJson, toToon } from '../lib/docs';
+import { absolute, href } from '../lib/site';
+
+const axis = loadCatalog();
+const tags = allTags(axis);
+const hero = axis.filter((a) => a.home).slice(0, 5);
+const pageUrl = (p: string) => absolute(p, Astro.site);
+const doc = registryDoc(axis, pageUrl);
+const json = toJson(doc);
+const toon = toToon(doc).trimEnd();
+const saved = Math.round((1 - toon.length / json.length) * 100);
+const fmt = new Intl.NumberFormat('en-US');
+const sizeRows = axis.map((a) => ({
+  a,
+  lines: a.home ? a.home.text.split('\n').length : undefined,
+  chars: a.home?.text.length,
+  moves: a.home ? suggestedCommands(a.home.text).length : undefined,
+}));
+---
+<Base
+  title="axis: command lines your agent can read"
+  description="The AXIs by bytesbybrandon: agent command lines that print their state, then what to run next, when run with no arguments."
+>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <h1 id="hero-title">Command lines your agent can read.</h1>
+        <p class="lead">With no arguments, each prints its state, then what to run next.</p>
+        <div class="actions">
+          <a class="btn" href="#list">Browse the AXIs</a>
+          <a class="btn btn--quiet" href="https://axi.md">Read the principles</a>
+        </div>
+      </div>
+      <div class="well hero__well" data-tabs>
+        <div class="well__tabs" role="tablist" aria-label="Pick an AXI to see its output with no arguments">
+          {hero.map((a, i) => (
+            <button class="tab" type="button" role="tab" id={`hero-tab-${a.name}`} aria-controls={`hero-panel-${a.name}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{a.name}</button>
+          ))}
+        </div>
+        {hero.map((a) => (
+          <div class="well__panel" role="tabpanel" id={`hero-panel-${a.name}`} aria-labelledby={`hero-tab-${a.name}`}>
+            <Output axi={a} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="list" aria-labelledby="list-title">
+    <div class="container">
+      <div class="band__head">
+        <h2 id="list-title">The roster</h2>
+        <form class="filter" role="search" data-filter>
+          <label class="filter__label" for="q">Search</label>
+          <input id="q" class="field" type="search" name="q" autocomplete="off" placeholder="Name, tag or what it wraps" />
+          {tags.length > 1 && (
+            <div class="chips" role="group" aria-label="Filter by tag">
+              {tags.map((t) => (
+                <button class="chip" type="button" data-tag={t} aria-pressed="false">{t}</button>
+              ))}
+            </div>
+          )}
+          <p class="filter__count" role="status" data-count><span data-shown>{axis.length}</span> of {axis.length} AXIs</p>
+        </form>
+      </div>
+      <ol class="ledger" data-ledger>
+        {axis.map((a) => (
+          <li class="row" data-row data-tags={a.tags.join(' ')} data-text={[a.name, a.description, a.wraps?.name, ...a.tags].filter(Boolean).join(' ').toLowerCase()}>
+            <h3 class="row__name"><a class="row__link" href={href(`axi/${a.name}/`)}>{a.name}</a></h3>
+            <p class="row__desc">{a.description}</p>
+            <p class="row__meta">
+              <span class="num">v{a.version}</span>
+              <span>{a.license}</span>
+              {a.tags.map((t) => <span>{t}</span>)}
+            </p>
+            <button class="copy row__copy" type="button" data-copy={a.install} aria-label={`Copy ${a.install}`}>Copy npx</button>
+          </li>
+        ))}
+      </ol>
+      <p class="empty" data-empty hidden>0 AXIs match. <button class="linkish" type="button" data-clear>Clear the filters</button> to see all {axis.length}.</p>
+    </div>
+  </section>
+
+  <section class="band band--tint" id="agents" aria-labelledby="agents-title">
+    <div class="container readers">
+      <div class="readers__copy">
+        {saved > 0 ? (
+          <>
+            <h2 id="agents-title"><span class="bignum num">{saved}%</span> fewer characters when an agent reads this list.</h2>
+          </>
+        ) : (
+          <h2 id="agents-title">This list, in the form agents read.</h2>
+        )}
+        <p>This page is the human copy. The same {axis.length} records are served as TOON and JSON, counted below.</p>
+        <dl class="stats">
+          <div><dt>catalog.toon.txt</dt><dd class="num">{fmt.format(toon.length)} characters</dd></div>
+          <div><dt>catalog.json</dt><dd class="num">{fmt.format(json.length)} characters</dd></div>
+        </dl>
+      </div>
+      <div class="well" data-tabs>
+        <div class="well__tabs" role="tablist" aria-label="Agent copies of the catalog">
+          <button class="tab" type="button" role="tab" id="agents-tab-toon" aria-controls="agents-panel-toon" aria-selected="true" tabindex="0">catalog.toon.txt</button>
+          <button class="tab" type="button" role="tab" id="agents-tab-json" aria-controls="agents-panel-json" aria-selected="false" tabindex="-1">catalog.json</button>
+        </div>
+        <div class="well__panel" role="tabpanel" id="agents-panel-toon" aria-labelledby="agents-tab-toon">
+          <pre class="out out--tall" tabindex="0" aria-label="The catalog in TOON"><code set:html={highlight(toon)} /></pre>
+          <p class="well__note"><a href={href('catalog.toon.txt')}>Open the file</a>. Each AXI also has one at axi/&lt;name&gt;.toon.txt.</p>
+        </div>
+        <div class="well__panel" role="tabpanel" id="agents-panel-json" aria-labelledby="agents-tab-json">
+          <pre class="out out--tall" tabindex="0" aria-label="The catalog in JSON"><code>{json}</code></pre>
+          <p class="well__note"><a href={href('catalog.json')}>Open the file</a>, indented as served.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="output" aria-labelledby="output-title">
+    <div class="container">
+      <h2 id="output-title">What each prints with no arguments</h2>
+      <table class="sizes">
+        <thead>
+          <tr><th scope="col">AXI</th><th scope="col" class="num">Version</th><th scope="col" class="num">Lines</th><th scope="col" class="num">Characters</th><th scope="col" class="num">Next moves</th></tr>
+        </thead>
+        <tbody>
+          {sizeRows.map(({ a, lines, chars, moves }) => (
+            <tr>
+              <th scope="row" data-label="AXI"><a href={href(`axi/${a.name}/`)}>{a.name}</a></th>
+              <td class="num" data-label="Version">{a.version}</td>
+              <td class="num" data-label="Lines">{lines ?? 'not captured'}</td>
+              <td class="num" data-label="Characters">{chars !== undefined ? fmt.format(chars) : 'not captured'}</td>
+              <td class="num" data-label="Next moves">{moves ?? 'not captured'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="table-note">Counted on the captured output. A next move is a command the output tells the agent to run.</p>
+    </div>
+  </section>
+
+  <section class="band band--tint" id="add" aria-labelledby="add-title">
+    <div class="container add">
+      <h2 id="add-title">Every folder in packages/ gets a page.</h2>
+      <ol class="steps">
+        <li><span>Put the package in <code>packages/&lt;name&gt;</code> with its own <code>package.json</code> and README.</span></li>
+        <li><span>Run <code>pnpm --filter @axis/site capture &lt;name&gt;</code> to record what it prints bare.</span></li>
+        <li><span>Optionally tag it in <code>apps/site/src/data/meta.json</code>.</span></li>
+        <li><span>Open a pull request. Merging to main publishes this site.</span></li>
+      </ol>
+    </div>
+  </section>
+</Base>
