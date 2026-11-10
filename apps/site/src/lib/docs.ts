@@ -1,6 +1,7 @@
 import { encode } from '@toon-format/toon';
 import type { Axi } from './catalog.ts';
-import { REPO, suggestedCommands } from './catalog.ts';
+import { REPO } from './catalog.ts';
+import { suggestedCommands } from './commands.ts';
 
 /** The registry as data. One shape feeds the JSON, the TOON and the llms.txt, so they cannot disagree. */
 export function registryDoc(axis: Axi[], pageUrl: (path: string) => string) {

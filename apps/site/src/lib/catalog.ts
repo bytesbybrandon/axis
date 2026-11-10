@@ -9,6 +9,8 @@ export interface Wraps {
 export interface Meta {
   tags?: string[];
   wraps?: Wraps;
+  /** OKLCH hue (0-360) the page takes on while this AXI is in focus. Derived from the name when omitted. */
+  hue?: number;
 }
 
 export interface HomeView {
@@ -24,6 +26,7 @@ export interface Axi {
   bins: string[];
   tags: string[];
   wraps?: Wraps;
+  hue: number;
   dir: string;
   repoUrl: string;
   npmUrl: string;
@@ -54,6 +57,16 @@ export interface CatalogInput {
 
 export const REPO = 'https://github.com/bytesbybrandon/axis';
 
+/** Hues that stay clean at the page's lightness. The olive and mustard band (80 to 135) reads dingy, so it is left out. */
+export const HUES = [10, 25, 40, 70, 145, 160, 175, 190, 205] as const;
+
+/** Stable fallback hue for an AXI with none set in meta.json: a pick from HUES by name. */
+export function hueFor(name: string): number {
+  let h = 2166136261;
+  for (const c of name) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
+  return HUES[h % HUES.length];
+}
+
 /** Reads every non-private package under packagesDir. Sorted by name so the output is stable. */
 export function buildCatalog({ packagesDir, meta, home, repo }: CatalogInput): Axi[] {
   const axis: Axi[] = [];
@@ -73,6 +86,7 @@ export function buildCatalog({ packagesDir, meta, home, repo }: CatalogInput): A
       bins,
       tags: meta[pkg.name]?.tags ?? [],
       wraps: meta[pkg.name]?.wraps,
+      hue: meta[pkg.name]?.hue ?? hueFor(pkg.name),
       dir,
       repoUrl: `${repo}/tree/main/packages/${dir}`,
       npmUrl: `https://www.npmjs.com/package/${pkg.name}`,
@@ -107,9 +121,4 @@ export function loadCatalog(): Axi[] {
 
 export function allTags(axis: Axi[]): string[] {
   return [...new Set(axis.flatMap((a) => a.tags))].sort();
-}
-
-/** Backticked commands in a captured output, the next moves it suggests. */
-export function suggestedCommands(text: string): string[] {
-  return [...new Set([...text.matchAll(/`([^`\n]+)`/g)].map((m) => m[1]))];
 }

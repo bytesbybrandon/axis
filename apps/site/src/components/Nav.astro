@@ -7,10 +7,13 @@ import { REPO } from '../lib/catalog';
     <a class="wordmark" href={href()} aria-label="axis, home">axis</a>
     <nav aria-label="Primary">
       <ul class="nav__links">
-        <li><a href={href('#list')}>AXIs</a></li>
-        <li><a href={href('#agents')}>Agents</a></li>
-        <li><a href={href('#add')}>Add one</a></li>
+        <li class="nav__opt"><a href={href('#list')}>Roster</a></li>
         <li><a href={REPO}>GitHub</a></li>
+        <li class="nav__search">
+          <button class="navkey" type="button" data-palette-open aria-label="Find an AXI">
+            <span>Find</span> <kbd data-mod>Ctrl</kbd> <kbd>K</kbd>
+          </button>
+        </li>
       </ul>
     </nav>
   </div>

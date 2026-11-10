@@ -93,7 +93,9 @@ pnpm --filter @axis/site capture [name...]    # re-record each AXI's no-argument
 
 `capture` runs the built package in an empty sandbox, so build packages first (`pnpm exec nx run-many -t build`).
 Re-capture after a package changes what it prints; the site build warns when a snapshot is missing or from an older version.
-Tags and the project an AXI wraps are optional and live in `apps/site/src/data/meta.json`.
+Tags, the project an AXI wraps and the page hue it takes on (`hue`, 0 to 360) are optional and live in `apps/site/src/data/meta.json`; without a hue the site picks one from a curated set by name.
+The hero plays `tttui-axi` by bundling its real command layer from `packages/tttui-axi/src` into the page, with `node:fs` and `node:path` swapped for in-memory shims in `apps/site/astro.config.mjs`.
+Each page gets a 1200 by 630 share card at `og/<name>.png`, drawn at build from the AXI's captured output.
 The site is private and needs Node.js 22.23.4 or later (Astro 7), so CI builds it on Node 24 only; the published packages still support 22.18.
 
 `verify:package` packs each package and checks the tarball: allowed files, no CR line endings, no spaces in paths, executable LF bins, the packed `LICENSE`, and an installed-tarball smoke run.
