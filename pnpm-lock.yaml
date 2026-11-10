@@ -112,8 +112,8 @@ importers:
   packages/reactive-skills-axi:
     dependencies:
       '@reactive-skills/axi':
-        specifier: 0.19.0
-        version: 0.19.0(supports-color@7.2.0)
+        specifier: 0.21.0
+        version: 0.21.0(supports-color@7.2.0)
 
   packages/tttui-axi: {}
 
@@ -834,13 +834,13 @@ packages:
     resolution: {integrity: sha512-pOr5+q1fLYKwFN3LAJuGZEnfXDcQ73zqgDHMtGy+K+uIoUqyY+6MeDCWFwfu+4EFuq76I5EPFofoNAI+Bmmq4A==}
     engines: {node: '>=22.13'}
 
-  '@reactive-skills/axi@0.19.0':
-    resolution: {integrity: sha512-Oy/pywI+Li1teQN7Aum7crNRGUkZF+9qW19O0OSNoUa6xPFKyJ9/PYG9YRXP032gntenlKy+f44vcC76bJtygg==}
+  '@reactive-skills/axi@0.21.0':
+    resolution: {integrity: sha512-LcSCHglWLqaPAhpDkwLr24RmMwkKOhZJnew1p+PBt0eyR8iWsPO5lRHop8O8XNxvGVL2lHCeNsh1R5gQP0xAtw==}
     engines: {node: '>=22.13.0'}
     hasBin: true
 
-  '@reactive-skills/runtime@0.19.0':
-    resolution: {integrity: sha512-WA71aAtaXYmxrRDqz7itCD0vIFg38BGMZ20NqF0htf9HD2hep9bxO8IlG0gIbN+fn3B9FVL8kpZHwaeVn51k7w==}
+  '@reactive-skills/runtime@0.21.0':
+    resolution: {integrity: sha512-23W2tG84mvzk4dr2z63zDeqnfoXpTwJGz6X1W+SVtRW3lMloFu9E7l7E85FnDe83+NhN9x41Sca8mldyDfAxYw==}
     engines: {node: '>=22.13.0'}
     hasBin: true
 
@@ -3751,16 +3751,16 @@ snapshots:
 
   '@pnpm/deps.graph-sequencer@1100.0.1': {}
 
-  '@reactive-skills/axi@0.19.0(supports-color@7.2.0)':
+  '@reactive-skills/axi@0.21.0(supports-color@7.2.0)':
     dependencies:
-      '@reactive-skills/runtime': 0.19.0(supports-color@7.2.0)
+      '@reactive-skills/runtime': 0.21.0(supports-color@7.2.0)
       '@toon-format/toon': 1.4.0
       js-yaml: 4.3.2
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
 
-  '@reactive-skills/runtime@0.19.0(supports-color@7.2.0)':
+  '@reactive-skills/runtime@0.21.0(supports-color@7.2.0)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.32.2(supports-color@7.2.0)(zod@3.25.76)
       '@typesafe-ai/sdk': 0.6.0
