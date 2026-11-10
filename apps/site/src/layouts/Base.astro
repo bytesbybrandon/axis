@@ -5,18 +5,24 @@ import '@fontsource-variable/jetbrains-mono';
 import '../styles/site.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Palette from '../components/Palette.astro';
 import { absolute, href } from '../lib/site';
 
 interface Props {
   title: string;
   description: string;
   path?: string;
+  /** Path of the social card under the site root; defaults to the home card. */
+  image?: string;
+  /** OKLCH hue the page is drenched in; the home page leaves it to the roster. */
+  hue?: number;
 }
-const { title, description, path = '' } = Astro.props;
+const { title, description, path = '', hue, image = 'og/default.png' } = Astro.props;
+const card = absolute(image, Astro.site);
 const canonical = absolute(path, Astro.site);
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" style={hue === undefined ? undefined : `--hue: ${hue}`}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -29,6 +35,11 @@ const canonical = absolute(path, Astro.site);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={card} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={card} />
     <meta name="theme-color" content="#f88a2f" />
     <script is:inline>document.documentElement.classList.add('js');</script>
   </head>
@@ -39,6 +50,7 @@ const canonical = absolute(path, Astro.site);
       <slot />
     </main>
     <Footer />
+    <Palette />
     <script>
       import '../scripts/site.ts';
     </script>

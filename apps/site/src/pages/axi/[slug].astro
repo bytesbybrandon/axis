@@ -1,9 +1,11 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Output from '../../components/Output.astro';
-import { loadCatalog, suggestedCommands } from '../../lib/catalog';
+import { loadCatalog } from '../../lib/catalog';
+import { suggestedCommands } from '../../lib/commands';
 import { axiDoc, toToon } from '../../lib/docs';
 import { highlight } from '../../lib/highlight';
+import { reportUrl } from '../../lib/links';
 import { renderReadme } from '../../lib/readme';
 import { absolute, href } from '../../lib/site';
 
@@ -15,15 +17,20 @@ const { axi } = Astro.props;
 const readme = await renderReadme(axi.readme, axi.repoUrl);
 const toon = toToon(axiDoc(axi, (p) => absolute(p, Astro.site))).trimEnd();
 const moves = axi.home ? suggestedCommands(axi.home.text) : [];
+const vt = `vt-${axi.name.replace(/[^a-z0-9-]/gi, '-')}`;
 ---
-<Base title={`${axi.name}: ${axi.description}`} description={axi.description} path={`axi/${axi.name}/`}>
+<Base title={`${axi.name}: ${axi.description}`} description={axi.description} path={`axi/${axi.name}/`} hue={axi.hue} image={`og/${axi.name}.png`}>
   <article>
     <header class="hello">
       <div class="container hello__grid">
         <div>
-          <p class="crumb"><a href={href('#list')}>All AXIs</a></p>
-          <h1 class="hello__name">{axi.name}</h1>
+          <p class="crumb"><a href={href('#list')}>The roster</a></p>
+          <h1 class="hello__name" style={`view-transition-name: ${vt}`}>{axi.name}</h1>
           <p class="lead">{axi.description}</p>
+          <div class="actions">
+            <button class="btn" type="button" data-copy={axi.install}><span data-copy-label>Copy {axi.install}</span></button>
+            <a class="btn btn--quiet" href={reportUrl(axi.name, axi.version)}>Report a problem</a>
+          </div>
         </div>
         <dl class="facts">
           <div><dt>Version</dt><dd class="num">{axi.version}</dd></div>

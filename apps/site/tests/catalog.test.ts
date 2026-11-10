@@ -3,8 +3,10 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
-import { buildCatalog, suggestedCommands } from '../src/lib/catalog.ts';
+import { buildCatalog, HUES, hueFor } from '../src/lib/catalog.ts';
+import { runnableCommands, suggestedCommands } from '../src/lib/commands.ts';
 import { llmsTxt, registryDoc, toJson, toToon } from '../src/lib/docs.ts';
+import { oklchToHex } from '../src/lib/color.ts';
 import { highlight } from '../src/lib/highlight.ts';
 import { adaptReadme, rewriteLinks } from '../src/lib/readme.ts';
 import { scrubHome } from '../scripts/scrub.mjs';
@@ -96,5 +98,28 @@ describe('README adaptation', () => {
 
   it('strips emoji from headings and leaves body text alone', () => {
     assert.equal(adaptReadme('<h2>⚡ Instant Run</h2><p>⚡ stays</p>'), '<h3>Instant Run</h3><p>⚡ stays</p>');
+  });
+});
+
+describe('runnableCommands', () => {
+  it('drops commands that still need a value filled in', () => {
+    const text = 'Run `t move <0-8>` or `t ai [level]` or `t ai` or `t reset`';
+    assert.deepEqual(runnableCommands(text), ['t ai', 't reset']);
+  });
+});
+
+describe('hueFor', () => {
+  it('is stable per name and always one of the curated hues', () => {
+    for (const name of ['a', 'honcho-axi', 'z'.repeat(40)]) {
+      assert.equal(hueFor(name), hueFor(name));
+      assert.ok((HUES as readonly number[]).includes(hueFor(name)));
+    }
+  });
+});
+
+describe('oklchToHex', () => {
+  it('matches the browser for the page paper and ink', () => {
+    assert.equal(oklchToHex(0.74, 0.165, 55), '#f88a2f');
+    assert.equal(oklchToHex(0.17, 0.03, 45), '#1a0b05');
   });
 });

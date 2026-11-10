@@ -1,0 +1,24 @@
+---
+import { loadCatalog } from '../lib/catalog';
+import { href } from '../lib/site';
+
+const items = loadCatalog().map((a) => ({
+  name: a.name,
+  description: a.description,
+  url: href(`axi/${a.name}/`),
+  install: a.install,
+  tags: a.tags,
+}));
+const json = JSON.stringify(items).replace(/</g, '\\u003c');
+---
+<dialog class="palette" data-palette aria-label="Find an AXI">
+  <div class="palette__box">
+    <input class="palette__input" type="search" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list" aria-label="Find an AXI" placeholder="Find an AXI by name or tag" autocomplete="off" spellcheck="false" />
+    <ul class="palette__list" id="palette-list" role="listbox" aria-label="AXIs"></ul>
+    <p class="palette__foot">
+      <span data-palette-status role="status"></span>
+      <span class="palette__keys"><kbd>Enter</kbd> opens <kbd data-mod>Ctrl</kbd> <kbd>Enter</kbd> copies the command <kbd>Esc</kbd> closes</span>
+    </p>
+  </div>
+</dialog>
+<script type="application/json" id="axi-index" set:html={json} />
