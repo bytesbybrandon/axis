@@ -44,17 +44,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # @axis/site is private and needs Node 22.23.4 or later (Astro 7), above the 22.18 floor the published packages support.
       - name: Build, test and verify affected packages
         if: github.event_name == 'pull_request'
         env:
           BASE: origin/${{ github.base_ref }}
+          EXCLUDE: ${{ matrix.node-version != '24.x' && '--exclude=@axis/site' || '' }}
         run: |
           echo "Affected projects: $(pnpm exec nx show projects --affected --base="$BASE" --head=HEAD --json)"
-          pnpm exec nx affected -t build test verify:package --base="$BASE" --head=HEAD
+          pnpm exec nx affected -t build test verify:package --base="$BASE" --head=HEAD $EXCLUDE
 
       - name: Build, test and verify all packages
         if: github.event_name != 'pull_request'
-        run: pnpm exec nx run-many -t build test verify:package
+        env:
+          EXCLUDE: ${{ matrix.node-version != '24.x' && '--exclude=@axis/site' || '' }}
+        run: pnpm exec nx run-many -t build test verify:package $EXCLUDE
 
       - name: Audit dependencies
         run: pnpm audit --audit-level=high
