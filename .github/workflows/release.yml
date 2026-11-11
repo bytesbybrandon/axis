@@ -1,0 +1,140 @@
+name: Release
+
+# Stages every package whose version is not on npm yet, using npm trusted publishing (OIDC, no
+# token). A staged version is not public until the owner approves it with `npm stage approve`
+# (two-factor). Each staged version gets a reminder issue assigned to the owner; a scheduled run
+# also tags published versions and closes reminders that are done. See docs/development.md.
+#
+# On npmjs.com every package's trusted publisher must be: repository bytesbybrandon/axis,
+# workflow release.yml, environment npm-release.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - packages/*/package.json
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: Package names to stage, comma separated (empty stages every unpublished version)
+        required: false
+        default: ""
+      restage:
+        description: Stage a version again after its reminder issue was closed (after a rejection)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # A run waiting for approval must not hold up the daily reminder run.
+  group: release-${{ github.event_name == 'schedule' && 'reminders' || 'publish' }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.event_name != 'schedule'
+    uses: ./.github/workflows/ci.yml
+
+  # Tags the npm latest version of each package at the commit it came from. The only job that can write to the repository.
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24.x
+          package-manager-cache: false
+
+      - name: Tag published versions
+        run: node tools/axis/publish.mjs --mode tag
+
+  # The only job with id-token: write. No npm token exists anywhere: npm exchanges the OIDC token for a one-run publish credential.
+  stage:
+    if: github.event_name != 'schedule'
+    needs: [verify, tag]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+      issues: read # the reminder issues record what is already staged
+    outputs:
+      staged: ${{ steps.stage.outputs.staged }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      # No registry-url and no cache: nothing may put a token in front of OIDC or restore state into a release build.
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24.x
+          package-manager-cache: false
+
+      - name: Install npm with staged publishing
+        run: npm install --global npm@^11.15.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and verify every package
+        run: pnpm exec nx run-many -t build verify:package --exclude=@axis/site
+
+      - name: Stage unpublished versions
+        id: stage
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ONLY: ${{ inputs.packages }}
+          RESTAGE: ${{ inputs.restage }}
+        run: |
+          args=(--mode stage)
+          if [ -n "$ONLY" ]; then args+=(--only "$ONLY"); fi
+          if [ "$RESTAGE" = "true" ]; then args+=(--restage); fi
+          node tools/axis/publish.mjs "${args[@]}"
+
+  # Opens or updates one issue per staged version and closes the ones that are done. Never installs dependencies.
+  reminders:
+    needs: stage
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24.x
+          package-manager-cache: false
+
+      - name: Update release reminders
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          STAGED: ${{ needs.stage.outputs.staged }}
+        run: node tools/axis/reminders.mjs

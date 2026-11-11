@@ -120,9 +120,9 @@ Other commands, including affected-only runs and the `verify:package` checks, ar
 ```text
 .
 ├── .changeset/              Changesets configuration for independent package releases
-├── .github/                 CI workflow, issue and pull request templates, community files
+├── .github/                 CI and release workflows, issue and pull request templates, community files
 ├── docs/
-│   ├── development.md       Workspace commands and package verification
+│   ├── development.md       Workspace commands, package verification and releasing
 │   └── history.md           Origin of each package and imported history
 ├── packages/
 │   ├── google-adk-axi/      Google ADK project AXI (bin, src, test, docs, skills)
@@ -130,7 +130,7 @@ Other commands, including affected-only runs and the `verify:package` checks, ar
 │   ├── pagescms-axi/        Pages CMS AXI (bin, src, test, docs, skills)
 │   ├── reactive-skills-axi/ Alias that runs @reactive-skills/axi (bin, test)
 │   └── tttui-axi/           Terminal tic-tac-toe AXI (bin, src, test, docs)
-├── tools/axis/              Shared tarball verifier used by every package's verify:package
+├── tools/axis/              Tarball verifier used by every package's verify:package, and the release tooling
 ├── nx.json                  Nx task defaults
 ├── package.json             Workspace scripts and pinned tooling
 └── pnpm-workspace.yaml      Workspace packages and dependency policy

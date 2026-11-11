@@ -12,7 +12,7 @@
     "text": "bin: <path>\ndescription: Inspect and manage Pages CMS content stored in GitHub repositories.\nservice: Pages CMS\nstatus: needs_repository\nrepository: null\nbranch: default\ncollections: []\ncount: 0\nmessage: 0 items found\nnext_step: Set PAGESCMS_REPOSITORY=OWNER/REPO or pass --repo OWNER/REPO.\nhelp[2]: Run `pagescms-axi collection list --repo OWNER/REPO` to inspect configured content.,Run `pagescms-axi content list --repo OWNER/REPO --collection NAME` to list entries."
   },
   "reactive-skills-axi": {
-    "version": "0.19.0",
+    "version": "0.21.0",
     "text": "bin: <path>\ndescription: AXI-compliant CLI for Reactive Skills Architecture — state, emit, events in TOON format\ncount: 0 skills total\nhelp[5]:\nRun `reactive-skills-axi init <name>` to scaffold a new reactive skill\n  Run `reactive-skills-axi inspect <path>` to inspect a skill statechart\n  Run `reactive-skills-axi events` to tail recent events\n  Run `reactive-skills-axi dashboard` to monitor multiple jobs through one broker\n  Run `reactive-skills-axi reset <skill>` to clear a prior skill run"
   },
   "tttui-axi": {

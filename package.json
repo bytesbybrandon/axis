@@ -9,6 +9,8 @@
   },
   "scripts": {
     "verify": "nx run-many -t build test verify:package",
+    "test:tools": "node --test tools/axis/*.test.mjs",
+    "release:check": "node tools/axis/publish.mjs --mode check",
     "changeset": "changeset"
   },
   "devDependencies": {
