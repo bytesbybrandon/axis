@@ -104,6 +104,7 @@ export function findVersionCommit(root, dir, version) {
 export async function release({ mode, root, ports, log = console.log }) {
   const packages = readPackages(root);
   const problems = [];
+  const logProblems = (list) => { for (const text of list) log(`  problem: ${text}`); };
 
   const tags = await ports.tags();
   const registries = new Map();
@@ -118,6 +119,7 @@ export async function release({ mode, root, ports, log = console.log }) {
       await ports.createTag(`${pkg.name}@${latest}`, sha);
       log(`tagged ${pkg.name}@${latest} at ${sha}`);
     }
+    logProblems(problems);
     return finish(problems, []);
   }
 
@@ -129,11 +131,15 @@ export async function release({ mode, root, ports, log = console.log }) {
     results.push(result);
     log(`${result.problems.length ? "FAIL" : "ok  "} ${pkg.name} ${pkg.version} ${result.state} (npm latest ${registries.get(pkg.name)?.latest ?? "none"}, ${packed.files.length} files)`);
   }
-  for (const text of problems) log(`  problem: ${text}`);
+  logProblems(problems);
   if (mode === "check" || problems.length) return finish(problems, []);
 
   const npm = await ports.npmVersion();
-  if (compareSemver(npm, MIN_STAGE_NPM) < 0) return finish([`npm ${npm} cannot stage; staged publishing needs npm ${MIN_STAGE_NPM} or later`], []);
+  if (compareSemver(npm, MIN_STAGE_NPM) < 0) {
+    const tooOld = [`npm ${npm} cannot stage; staged publishing needs npm ${MIN_STAGE_NPM} or later`];
+    logProblems(tooOld);
+    return finish(tooOld, []);
+  }
 
   const staged = [];
   const errors = [];

@@ -183,8 +183,10 @@ test("stage mode needs npm 11.15 or later, check mode does not", async () => {
   const root = workspace({ "a-axi": manifest("a-axi", "1.0.1"), "b-axi": manifest("b-axi", "1.0.0") });
   try {
     const old = fakePorts({ npmVersion: async () => "10.9.9" });
-    assert.equal((await release({ mode: "stage", root, ports: old.ports, log: quiet })).exitCode, 1);
+    const lines = [];
+    assert.equal((await release({ mode: "stage", root, ports: old.ports, log: (line) => lines.push(line) })).exitCode, 1);
     assert.deepEqual(old.calls.stage, []);
+    assert.match(lines.join("\n"), /npm 10\.9\.9 cannot stage; staged publishing needs npm 11\.15\.0 or later/);
     const edge = fakePorts({ npmVersion: async () => "11.15.0" });
     assert.equal((await release({ mode: "stage", root, ports: edge.ports, log: quiet })).exitCode, 0);
     const check = fakePorts({ npmVersion: async () => "10.9.9" });
@@ -303,9 +305,11 @@ test("tag mode fails when it cannot find the commit and ignores unpublished pack
       registry: async (name) => (name === "a-axi" ? { latest: "1.0.1", versions: ["1.0.1"] } : null),
       findCommit: async () => null,
     });
-    const r = await release({ mode: "tag", root, ports, log: quiet });
+    const lines = [];
+    const r = await release({ mode: "tag", root, ports, log: (line) => lines.push(line) });
     assert.equal(r.exitCode, 1);
     assert.deepEqual(calls.tags, []);
+    assert.match(lines.join("\n"), /a-axi: cannot find the commit of 1\.0\.1; tag a-axi@1\.0\.1 by hand/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
