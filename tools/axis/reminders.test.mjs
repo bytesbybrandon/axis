@@ -19,6 +19,12 @@ test("the body carries the exact npm commands for the stage id", () => {
   assert.ok(body.includes("two-factor"));
 });
 
+test("the body tells the owner that closing the issue after a rejection lets the next run stage the version again", () => {
+  const body = reminderBody({ name: "tttui-axi", version: "1.0.1", stageId: ID, runUrl: "u" });
+  assert.match(body, /close this issue after `npm stage reject`/);
+  assert.match(body, /next release run can then stage the version again/);
+});
+
 test("without a stage id the body points at npm stage list", () => {
   const body = reminderBody({ name: "tttui-axi", version: "1.0.1", runUrl: "u" });
   assert.ok(body.includes("npm stage list tttui-axi"));
@@ -39,7 +45,7 @@ function fakeGithub(issues = []) {
   };
 }
 
-const base = { runUrl: "https://example.test/run", currentVersions: new Map(), isPublished: async () => false };
+const base = { runUrl: "https://example.test/run", isPublished: async () => false };
 const kinds = (g) => g.calls.map((c) => c[0]);
 
 test("a newly staged version opens one issue for the owner", async () => {
@@ -61,7 +67,7 @@ test("staging the same version again updates the open issue instead of duplicati
   assert.ok(g.calls.find((c) => c[0] === "update")[2].body.includes(ID));
 });
 
-test("restaging a rejected version reopens its closed issue", async () => {
+test("staging a version whose issue the owner closed after a rejection reopens that issue", async () => {
   const g = fakeGithub([{ number: 5, state: "closed", title: reminderTitle("tttui-axi", "1.0.1"), body: "old" }]);
   const r = await syncReminders({ ...base, github: g, staged: [{ name: "tttui-axi", version: "1.0.1", stageId: ID }] });
   assert.deepEqual(r.reopened, ["tttui-axi@1.0.1"]);
@@ -70,24 +76,16 @@ test("restaging a rejected version reopens its closed issue", async () => {
 
 test("an open issue whose version is now on npm is closed with a comment", async () => {
   const g = fakeGithub([{ number: 5, state: "open", title: reminderTitle("tttui-axi", "1.0.1"), body: "" }]);
-  const r = await syncReminders({ ...base, github: g, staged: [], currentVersions: new Map([["tttui-axi", "1.0.1"]]), isPublished: async (n, v) => n === "tttui-axi" && v === "1.0.1" });
+  const r = await syncReminders({ ...base, github: g, staged: [], isPublished: async (n, v) => n === "tttui-axi" && v === "1.0.1" });
   assert.deepEqual(r.closed, ["tttui-axi@1.0.1"]);
   assert.deepEqual(kinds(g), ["label", "comment", "update"]);
   assert.equal(g.calls[2][2].state, "closed");
   assert.equal(g.calls[2][2].state_reason, "completed");
 });
 
-test("an open issue for a version package.json has moved past is closed as superseded", async () => {
-  const g = fakeGithub([{ number: 5, state: "open", title: reminderTitle("tttui-axi", "1.0.1"), body: "" }]);
-  const r = await syncReminders({ ...base, github: g, staged: [], currentVersions: new Map([["tttui-axi", "1.0.2"]]) });
-  assert.deepEqual(r.closed, ["tttui-axi@1.0.1"]);
-  assert.equal(g.calls.at(-1)[2].state_reason, "not_planned");
-  assert.match(g.calls.find((c) => c[0] === "comment")[2], /npm stage reject/);
-});
-
 test("a version still waiting stays open and is not touched", async () => {
   const g = fakeGithub([{ number: 5, state: "open", title: reminderTitle("tttui-axi", "1.0.1"), body: "" }]);
-  const r = await syncReminders({ ...base, github: g, staged: [], currentVersions: new Map([["tttui-axi", "1.0.1"]]) });
+  const r = await syncReminders({ ...base, github: g, staged: [] });
   assert.deepEqual(r.closed, []);
   assert.deepEqual(kinds(g), ["label"]);
 });
@@ -97,15 +95,25 @@ test("unrelated issues and closed reminders are left alone", async () => {
     { number: 1, state: "open", title: "Something else", body: "" },
     { number: 2, state: "closed", title: reminderTitle("tttui-axi", "1.0.0"), body: "" },
   ]);
-  await syncReminders({ ...base, github: g, staged: [], currentVersions: new Map([["tttui-axi", "1.0.0"]]), isPublished: async () => true });
+  await syncReminders({ ...base, github: g, staged: [], isPublished: async () => true });
   assert.deepEqual(kinds(g), ["label"]);
 });
 
 test("a registry error leaves the issue open and fails the sync", async () => {
   const g = fakeGithub([{ number: 5, state: "open", title: reminderTitle("tttui-axi", "1.0.1"), body: "" }]);
-  const r = await syncReminders({ ...base, github: g, staged: [], currentVersions: new Map([["tttui-axi", "1.0.1"]]), isPublished: async () => { throw new Error("offline"); } });
+  const r = await syncReminders({ ...base, github: g, staged: [], isPublished: async () => { throw new Error("offline"); } });
   assert.equal(r.errors.length, 1);
   assert.deepEqual(kinds(g), ["label"]);
+});
+
+test("a GitHub failure on one staged version does not lose the reminders of the others", async () => {
+  const g = fakeGithub();
+  const createIssue = g.createIssue;
+  g.createIssue = async (input) => { if (input.title.includes("honcho-axi")) throw new Error("GitHub 502"); return createIssue(input); };
+  const r = await syncReminders({ ...base, github: g, staged: [{ name: "honcho-axi", version: "0.1.1" }, { name: "tttui-axi", version: "1.0.1", stageId: ID }] });
+  assert.deepEqual(r.created, ["tttui-axi@1.0.1"]);
+  assert.equal(r.errors.length, 1);
+  assert.match(r.errors[0], /honcho-axi@0\.1\.1: GitHub 502/);
 });
 
 test("the GitHub client sends the token, pages through issues and creates a missing label", async () => {

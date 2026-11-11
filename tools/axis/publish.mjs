@@ -4,7 +4,6 @@
 //   node tools/axis/publish.mjs --mode tag       # tag the npm latest version of each package at its source commit
 //   node tools/axis/publish.mjs --mode stage     # check, then stage every unpublished version (nothing becomes public)
 //
-// Options: --only a,b (stage only these packages), --restage (stage a version whose reminder issue was closed).
 // Staged versions only become public when the owner approves them with `npm stage approve` (2FA).
 // Run `pnpm verify` first: packing needs each package built. Uses Node built-ins only.
 import { spawnSync } from "node:child_process";
@@ -16,10 +15,8 @@ import { createGithub, reminderTitle } from "./reminders.mjs";
 
 export const REPOSITORY_URL = "git+https://github.com/bytesbybrandon/axis.git";
 export const MIN_STAGE_NPM = "11.15.0";
-const PLACEHOLDER = "0.0.0-stage"; // npm publishes this when a package is first staged
 const SEMVER = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$/;
 const FORBIDDEN = [/(^|\/)(node_modules|\.git|\.github|\.env[^/]*|test|tests|__tests__)(\/|$)/, /\.(tgz|log)$/, /(^|\/)\.DS_Store$/];
-const MAX_FILES = 500;
 
 function parseSemver(v) {
   const m = SEMVER.exec(v);
@@ -55,7 +52,7 @@ export function checkPackage({ dir, pkg, registry, tags, files }) {
   if (pkg.repository?.url !== REPOSITORY_URL) fail(`repository.url is ${pkg.repository?.url ?? "missing"}; npm trusted publishing needs exactly ${REPOSITORY_URL}`);
   if (pkg.repository?.directory !== `packages/${dir}`) fail(`repository.directory is ${pkg.repository?.directory ?? "missing"}; expected packages/${dir}`);
 
-  const latest = registry && registry.latest !== PLACEHOLDER ? registry.latest : null;
+  const latest = registry?.latest ?? null;
   const state = registry?.versions.includes(version) ? "published" : "pending";
   if (latest && compareSemver(version, latest) < 0) fail(`version ${version} is lower than npm latest ${latest}; never go backwards or reuse a number`);
   if (latest && !tags.includes(`${name}@${latest}`)) fail(`npm latest ${latest} has no baseline tag ${name}@${latest}; the tag job of the release workflow creates it`);
@@ -63,7 +60,6 @@ export function checkPackage({ dir, pkg, registry, tags, files }) {
 
   if (files) {
     if (!files.length) fail("the tarball is empty: nothing is packed");
-    if (files.length > MAX_FILES) fail(`the tarball has ${files.length} files, more than ${MAX_FILES}`);
     if (!files.includes("LICENSE")) fail("LICENSE is not packed");
     for (const path of files) if (FORBIDDEN.some((re) => re.test(path))) fail(`packed path ${path} should not ship`);
     for (const entry of pkg.files ?? []) {
@@ -102,12 +98,12 @@ export function findVersionCommit(root, dir, version) {
   return r.status === 0 ? r.stdout.split("\n")[0] || null : null;
 }
 
-// ports: registry(name), tags(), pack(dir), npmVersion(), reminderState(name, version), stage(tarball, tag), findCommit(name, dir, version), createTag(tag, sha)
-export async function release({ mode, root, ports, only = [], restage = false, log = console.log }) {
+// ports: registry(name), tags(), pack(dir), npmVersion(), hasOpenReminder(name, version), stage(tarball), findCommit(name, dir, version), createTag(tag, sha)
+// A version is stageable unless its reminder issue is open: an open issue means "staged, waiting for approval", a closed one
+// for a version that is not on npm means the owner rejected the stage, so the next run may stage it again.
+export async function release({ mode, root, ports, log = console.log }) {
   const packages = readPackages(root);
   const problems = [];
-  const names = packages.map(({ pkg }) => pkg.name);
-  for (const name of only) if (!names.includes(name)) problems.push(`--only names ${name}, which is not a publishable package here`);
 
   const tags = await ports.tags();
   const registries = new Map();
@@ -116,7 +112,7 @@ export async function release({ mode, root, ports, only = [], restage = false, l
   if (mode === "tag") {
     for (const { dir, pkg } of packages) {
       const latest = registries.get(pkg.name)?.latest;
-      if (!latest || latest === PLACEHOLDER || tags.includes(`${pkg.name}@${latest}`)) continue;
+      if (!latest || tags.includes(`${pkg.name}@${latest}`)) continue;
       const sha = await ports.findCommit(pkg.name, dir, latest);
       if (!sha) { problems.push(`${pkg.name}: cannot find the commit of ${latest}; tag ${pkg.name}@${latest} by hand`); continue; }
       await ports.createTag(`${pkg.name}@${latest}`, sha);
@@ -142,16 +138,14 @@ export async function release({ mode, root, ports, only = [], restage = false, l
   const staged = [];
   const errors = [];
   for (const r of results) {
-    if (r.state !== "pending" || (only.length && !only.includes(r.name))) continue;
-    const ledger = await ports.reminderState(r.name, r.version);
-    if (ledger === "open") { log(`skip ${r.name} ${r.version}: already staged, waiting for approval (open reminder issue)`); continue; }
-    if (ledger === "closed" && !restage) { log(`skip ${r.name} ${r.version}: its reminder issue was closed, so the stage was rejected; run with restage to stage it again`); continue; }
+    if (r.state !== "pending") continue;
     try {
-      const { stageId } = await ports.stage(r.tarball, r.version.includes("-") ? "next" : "latest");
+      if (await ports.hasOpenReminder(r.name, r.version)) { log(`skip ${r.name} ${r.version}: already staged, waiting for approval (open reminder issue)`); continue; }
+      const { stageId } = await ports.stage(r.tarball);
       staged.push({ name: r.name, version: r.version, stageId });
       log(`staged ${r.name} ${r.version} (stage id ${stageId})`);
     } catch (error) {
-      errors.push(`${r.name}: staging failed:\n${error.message}`);
+      errors.push(`${r.name}: not staged:\n${error.message}`);
     }
   }
   for (const text of errors) log(`  error: ${text}`);
@@ -188,15 +182,14 @@ function realPorts(root, tmp) {
       return { path: join(tmp, packed.filename), files: packed.files.map((f) => f.path) };
     },
     async npmVersion() { return run("npm", ["--version"]).stdout.trim(); },
-    async reminderState(name, version) {
+    async hasOpenReminder(name, version) {
       const { GITHUB_TOKEN, GITHUB_REPOSITORY } = process.env;
       if (!GITHUB_TOKEN || !GITHUB_REPOSITORY) throw new Error("GITHUB_TOKEN and GITHUB_REPOSITORY are needed to read the reminder issues, which record what is already staged");
       const title = reminderTitle(name, version);
-      const matches = (await createGithub({ token: GITHUB_TOKEN, repo: GITHUB_REPOSITORY }).listReminders()).filter((i) => i.title === title);
-      return matches.some((i) => i.state === "open") ? "open" : matches.length ? "closed" : null;
+      return (await createGithub({ token: GITHUB_TOKEN, repo: GITHUB_REPOSITORY }).listReminders()).some((i) => i.title === title && i.state === "open");
     },
-    async stage(tarball, tag) {
-      const r = run("npm", ["stage", "publish", tarball, "--tag", tag, "--json"], { cwd: root });
+    async stage(tarball) {
+      const r = run("npm", ["stage", "publish", tarball, "--json"], { cwd: root });
       if (r.status !== 0) throw new Error(`npm stage publish ${tarball} exited ${r.status}\n${r.stdout}\n${r.stderr}`);
       return parseStageJson(r.stdout);
     },
@@ -210,14 +203,12 @@ function realPorts(root, tmp) {
 }
 
 function parseArgs(argv) {
-  const opt = { mode: undefined, only: [], restage: false };
+  const opt = { mode: undefined };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--mode") opt.mode = argv[++i];
-    else if (argv[i] === "--only") opt.only = (argv[++i] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-    else if (argv[i] === "--restage") opt.restage = true;
     else throw new Error(`unknown argument ${argv[i]}`);
   }
-  if (!["check", "tag", "stage"].includes(opt.mode)) throw new Error("usage: publish.mjs --mode check|tag|stage [--only a,b] [--restage]");
+  if (!["check", "tag", "stage"].includes(opt.mode)) throw new Error("usage: publish.mjs --mode check|tag|stage");
   return opt;
 }
 

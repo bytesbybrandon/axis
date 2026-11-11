@@ -1,12 +1,13 @@
 // Release approval reminders: one GitHub issue per staged package version, so a staged
 // release cannot be forgotten. The issue is also the ledger of what is staged, because the
-// OIDC token CI holds cannot list stages. Uses only Node built-ins, so the job that holds
+// OIDC token CI holds cannot list stages: an open issue means staged and waiting; an issue the
+// owner closed for a version that is not on npm means the stage was rejected, so the next
+// staging run may stage that version again. Uses only Node built-ins, so the job that holds
 // `issues: write` never installs dependencies.
 //
 //   node tools/axis/reminders.mjs     # env: GITHUB_TOKEN, GITHUB_REPOSITORY, STAGED (JSON), GITHUB_SERVER_URL, GITHUB_RUN_ID
 import { spawnSync } from "node:child_process";
-import { readFileSync, readdirSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const LABEL = "release-approval";
@@ -37,7 +38,9 @@ npm stage reject ${id}     # discards the stage; nothing is published
 
 You can also review it under Staged Packages on https://www.npmjs.com/package/${name}.
 
-This issue closes itself in the next release run (one runs every day) once ${version} is on npm, or once \`package.json\` moves on to another version. If you reject the stage, close this issue yourself. Running the Release workflow with \`restage\` stages the same version again and reopens it.
+This issue closes itself in the next release run (one runs every day) once ${version} is on npm. Keep it open while the stage is waiting: an open issue is how the workflow knows not to stage it twice.
+
+If you reject the stage, close this issue after \`npm stage reject\`. The next release run can then stage the version again, and reopens this issue when it does.
 `;
 }
 
@@ -76,8 +79,8 @@ export function createGithub({ token, repo, fetchImpl = fetch, api = "https://ap
   };
 }
 
-// staged: [{ name, version, stageId }] from this run. currentVersions: Map name -> version in package.json.
-export async function syncReminders({ github, staged, currentVersions, isPublished, runUrl }) {
+// staged: [{ name, version, stageId }] from this run. Open issues are closed only when their version is on npm.
+export async function syncReminders({ github, staged, isPublished, runUrl }) {
   const out = { created: [], updated: [], reopened: [], closed: [], errors: [] };
   await github.ensureLabel();
   const issues = await github.listReminders();
@@ -91,15 +94,19 @@ export async function syncReminders({ github, staged, currentVersions, isPublish
     const existing = byTitle.get(title);
     stagedTitles.add(title);
     const key = `${s.name}@${s.version}`;
-    if (!existing) {
-      await github.createIssue({ title, body, labels: [LABEL], assignees: [ASSIGNEE] });
-      out.created.push(key);
-    } else if (existing.state === "open") {
-      await github.updateIssue(existing.number, { body });
-      out.updated.push(key);
-    } else {
-      await github.updateIssue(existing.number, { body, state: "open" });
-      out.reopened.push(key);
+    try {
+      if (!existing) {
+        await github.createIssue({ title, body, labels: [LABEL], assignees: [ASSIGNEE] });
+        out.created.push(key);
+      } else if (existing.state === "open") {
+        await github.updateIssue(existing.number, { body });
+        out.updated.push(key);
+      } else {
+        await github.updateIssue(existing.number, { body, state: "open" });
+        out.reopened.push(key);
+      }
+    } catch (error) {
+      out.errors.push(`${key}: ${error.message}`);
     }
   }
 
@@ -111,10 +118,6 @@ export async function syncReminders({ github, staged, currentVersions, isPublish
       if (await isPublished(ref.name, ref.version)) {
         await github.comment(issue.number, `${key} is on npm. Closing this reminder.`);
         await github.updateIssue(issue.number, { state: "closed", state_reason: "completed" });
-        out.closed.push(key);
-      } else if (currentVersions.get(ref.name) !== ref.version) {
-        await github.comment(issue.number, `package.json now says ${currentVersions.get(ref.name) ?? "nothing"} for ${ref.name}, so ${key} will not be released from this branch. Closing this reminder. If the stage is still pending, discard it with \`npm stage reject <stage-id>\`.`);
-        await github.updateIssue(issue.number, { state: "closed", state_reason: "not_planned" });
         out.closed.push(key);
       }
     } catch (error) {
@@ -138,25 +141,12 @@ export function npmHasVersion(name, version, run = spawnSync) {
   throw new Error(`npm view ${name}@${version} failed: ${text.trim()}`);
 }
 
-export function readCurrentVersions(root) {
-  const versions = new Map();
-  for (const dir of readdirSync(join(root, "packages"))) {
-    try {
-      const pkg = JSON.parse(readFileSync(join(root, "packages", dir, "package.json"), "utf8"));
-      if (!pkg.private) versions.set(pkg.name, pkg.version);
-    } catch { /* not a package directory */ }
-  }
-  return versions;
-}
-
 async function main() {
   const { GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_SERVER_URL = "https://github.com", GITHUB_RUN_ID, STAGED } = process.env;
   if (!GITHUB_TOKEN || !GITHUB_REPOSITORY) throw new Error("GITHUB_TOKEN and GITHUB_REPOSITORY are required");
-  const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   const result = await syncReminders({
     github: createGithub({ token: GITHUB_TOKEN, repo: GITHUB_REPOSITORY }),
     staged: STAGED ? JSON.parse(STAGED) : [],
-    currentVersions: readCurrentVersions(root),
     isPublished: async (name, version) => npmHasVersion(name, version),
     runUrl: `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`,
   });

@@ -95,12 +95,6 @@ test("an unpublished version must not already be tagged", () => {
   assert.match(r.problems.join("\n"), /x-axi@1\.0\.1 exists but 1\.0\.1 is not on npm/);
 });
 
-test("the 0.0.0-stage placeholder is not a baseline", () => {
-  const r = check({ registry: { latest: "0.0.0-stage", versions: ["0.0.0-stage"] }, tags: [] });
-  assert.deepEqual(r.problems, []);
-  assert.equal(r.state, "pending");
-});
-
 test("an invalid version is refused", () => {
   assert.match(check({ pkg: pkg({ version: "latest" }) }).problems.join("\n"), /not a semver/);
 });
@@ -145,14 +139,14 @@ function manifest(name, version, over = {}) {
 }
 
 function fakePorts(over = {}) {
-  const calls = { stage: [], tags: [], reminderState: [] };
+  const calls = { stage: [], tags: [], hasOpenReminder: [] };
   const ports = {
     registry: async () => ({ latest: "1.0.0", versions: ["1.0.0"] }),
     tags: async () => ["a-axi@1.0.0", "b-axi@1.0.0"],
     pack: async (dir) => ({ path: `/tmp/${dir}.tgz`, files: goodFiles }),
     npmVersion: async () => "11.21.2",
-    reminderState: async (name, version) => { calls.reminderState.push(`${name}@${version}`); return null; },
-    stage: async (tarball, tag) => { calls.stage.push([tarball, tag]); return { stageId: `id-of-${tarball.split("/").pop()}` }; },
+    hasOpenReminder: async (name, version) => { calls.hasOpenReminder.push(`${name}@${version}`); return false; },
+    stage: async (tarball) => { calls.stage.push(tarball); return { stageId: `id-of-${tarball.split("/").pop()}` }; },
     findCommit: async () => "abc123",
     createTag: async (tag, sha) => { calls.tags.push([tag, sha]); },
     ...over,
@@ -168,17 +162,8 @@ test("stage mode stages only pending packages and reports them", async () => {
     const { ports, calls } = fakePorts();
     const r = await release({ mode: "stage", root, ports, log: quiet });
     assert.equal(r.exitCode, 0);
-    assert.deepEqual(calls.stage, [["/tmp/a-axi.tgz", "latest"]]);
+    assert.deepEqual(calls.stage, ["/tmp/a-axi.tgz"]);
     assert.deepEqual(r.staged, [{ name: "a-axi", version: "1.0.1", stageId: "id-of-a-axi.tgz" }]);
-  } finally { rmSync(root, { recursive: true, force: true }); }
-});
-
-test("a prerelease is staged under the next tag", async () => {
-  const root = workspace({ "a-axi": manifest("a-axi", "1.1.0-rc.1"), "b-axi": manifest("b-axi", "1.0.0") });
-  try {
-    const { ports, calls } = fakePorts();
-    await release({ mode: "stage", root, ports, log: quiet });
-    assert.equal(calls.stage[0][1], "next");
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -213,39 +198,32 @@ test("check mode never stages and never reads the reminder ledger", async () => 
     const r = await release({ mode: "check", root, ports, log: quiet });
     assert.equal(r.exitCode, 0);
     assert.deepEqual(calls.stage, []);
-    assert.deepEqual(calls.reminderState, []);
+    assert.deepEqual(calls.hasOpenReminder, []);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test("an open reminder means already staged; a closed one means rejected until --restage", async () => {
+test("an open reminder means already staged, so it is not staged again", async () => {
   const root = workspace({ "a-axi": manifest("a-axi", "1.0.1"), "b-axi": manifest("b-axi", "1.0.0") });
   try {
-    const open = fakePorts({ reminderState: async () => "open" });
-    const o = await release({ mode: "stage", root, ports: open.ports, log: quiet });
-    assert.equal(o.exitCode, 0);
+    const open = fakePorts({ hasOpenReminder: async () => true });
+    const r = await release({ mode: "stage", root, ports: open.ports, log: quiet });
+    assert.equal(r.exitCode, 0);
     assert.deepEqual(open.calls.stage, []);
-
-    const closed = fakePorts({ reminderState: async () => "closed" });
-    const c = await release({ mode: "stage", root, ports: closed.ports, log: quiet });
-    assert.equal(c.exitCode, 0);
-    assert.deepEqual(closed.calls.stage, []);
-
-    const again = fakePorts({ reminderState: async () => "closed" });
-    const a = await release({ mode: "stage", root, ports: again.ports, restage: true, log: quiet });
-    assert.equal(a.exitCode, 0);
-    assert.equal(again.calls.stage.length, 1);
+    assert.deepEqual(r.staged, []);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test("--only limits staging to the named packages", async () => {
-  const root = workspace({ "a-axi": manifest("a-axi", "1.0.1"), "b-axi": manifest("b-axi", "1.0.1") });
+test("a version whose reminder issue was closed and is not on npm was rejected, so it is staged again", async () => {
+  const root = workspace({ "a-axi": manifest("a-axi", "1.0.1"), "b-axi": manifest("b-axi", "1.0.0") });
   try {
-    const { ports, calls } = fakePorts();
-    const r = await release({ mode: "stage", root, ports, only: ["b-axi"], log: quiet });
+    const issues = [{ title: "Release waiting for your approval: a-axi 1.0.1", state: "closed" }];
+    const { ports, calls } = fakePorts({
+      hasOpenReminder: async (name, version) => issues.some((i) => i.state === "open" && i.title === `Release waiting for your approval: ${name} ${version}`),
+    });
+    const r = await release({ mode: "stage", root, ports, log: quiet });
     assert.equal(r.exitCode, 0);
-    assert.deepEqual(calls.stage.map(([t]) => t), ["/tmp/b-axi.tgz"]);
-    const missing = await release({ mode: "stage", root, ports: fakePorts().ports, only: ["nope"], log: quiet });
-    assert.equal(missing.exitCode, 1);
+    assert.deepEqual(calls.stage, ["/tmp/a-axi.tgz"]);
+    assert.deepEqual(r.staged, [{ name: "a-axi", version: "1.0.1", stageId: "id-of-a-axi.tgz" }]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -259,6 +237,21 @@ test("a failed stage fails the run but later packages are still staged", async (
     const r = await release({ mode: "stage", root, ports, log: quiet });
     assert.equal(r.exitCode, 1);
     assert.deepEqual(r.staged, [{ name: "b-axi", version: "1.0.1", stageId: "id-2" }]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("a ledger read failure on a later package keeps the packages already staged in the result", async () => {
+  const root = workspace({ "a-axi": manifest("a-axi", "1.0.1"), "b-axi": manifest("b-axi", "1.0.1"), "c-axi": manifest("c-axi", "1.0.1") });
+  try {
+    const { ports, calls } = fakePorts({
+      tags: async () => ["a-axi@1.0.0", "b-axi@1.0.0", "c-axi@1.0.0"],
+      hasOpenReminder: async (name) => { if (name === "b-axi") throw new Error("GitHub 502"); return false; },
+    });
+    const r = await release({ mode: "stage", root, ports, log: quiet });
+    assert.equal(r.exitCode, 1);
+    assert.match(r.problems.join("\n"), /b-axi: not staged[\s\S]*GitHub 502/);
+    assert.deepEqual(calls.stage, ["/tmp/a-axi.tgz", "/tmp/c-axi.tgz"]);
+    assert.deepEqual(r.staged.map((x) => x.name), ["a-axi", "c-axi"]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
