@@ -79,6 +79,12 @@ export function createGithub({ token, repo, fetchImpl = fetch, api = "https://ap
   };
 }
 
+// The ledger rule: an open issue with the exact title means "staged, waiting for approval". A closed one (rejected) or none means stageable.
+export async function hasOpenReminder(github, name, version) {
+  const title = reminderTitle(name, version);
+  return (await github.listReminders()).some((i) => i.title === title && i.state === "open");
+}
+
 // staged: [{ name, version, stageId }] from this run. Open issues are closed only when their version is on npm.
 export async function syncReminders({ github, staged, isPublished, runUrl }) {
   const out = { created: [], updated: [], reopened: [], closed: [], errors: [] };

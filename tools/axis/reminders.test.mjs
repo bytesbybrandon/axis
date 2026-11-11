@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LABEL, createGithub, npmHasVersion, parseReminderTitle, reminderBody, reminderTitle, syncReminders } from "./reminders.mjs";
+import { LABEL, createGithub, hasOpenReminder, npmHasVersion, parseReminderTitle, reminderBody, reminderTitle, syncReminders } from "./reminders.mjs";
 
 const ID = "0b1c3f4e-0000-4000-8000-000000000001";
 
@@ -132,6 +132,25 @@ test("the GitHub client sends the token, pages through issues and creates a miss
   assert.ok(seen.every(([, , auth]) => auth === "Bearer tok"));
   assert.ok(seen.some(([m, u]) => m === "POST" && u.endsWith("/repos/o/r/labels")));
   assert.ok(seen.some(([, u]) => u.includes("labels=release-approval") && u.includes("state=all")));
+});
+
+test("hasOpenReminder is true only for an open issue with the exact title", async () => {
+  const title = reminderTitle("tttui-axi", "1.0.1");
+  const ledger = (issues) => ({ listReminders: async () => issues });
+  assert.equal(await hasOpenReminder(ledger([{ title, state: "open" }]), "tttui-axi", "1.0.1"), true);
+  assert.equal(await hasOpenReminder(ledger([{ title, state: "closed" }]), "tttui-axi", "1.0.1"), false);
+  assert.equal(await hasOpenReminder(ledger([]), "tttui-axi", "1.0.1"), false);
+  assert.equal(await hasOpenReminder(ledger([{ title: reminderTitle("tttui-axi", "1.0.2"), state: "open" }, { title: reminderTitle("honcho-axi", "1.0.1"), state: "open" }, { title: "Something else", state: "open" }]), "tttui-axi", "1.0.1"), false);
+  assert.equal(await hasOpenReminder(ledger([{ title, state: "closed" }, { title, state: "open" }]), "tttui-axi", "1.0.1"), true);
+});
+
+test("hasOpenReminder finds an open issue on a later page of the GitHub list", async () => {
+  const title = reminderTitle("tttui-axi", "1.0.1");
+  const pages = { 1: Array.from({ length: 100 }, () => ({ title: "Something else", state: "closed" })), 2: [{ title, state: "open" }] };
+  const fetchImpl = async (url) => new Response(JSON.stringify(pages[Number(new URL(url).searchParams.get("page"))] ?? []), { status: 200 });
+  const github = createGithub({ token: "t", repo: "o/r", fetchImpl });
+  assert.equal(await hasOpenReminder(github, "tttui-axi", "1.0.1"), true);
+  assert.equal(await hasOpenReminder(github, "tttui-axi", "1.0.2"), false);
 });
 
 test("npmHasVersion is true only for the exact version and false only for E404", () => {

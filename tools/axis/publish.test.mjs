@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -11,7 +11,9 @@ import {
   findVersionCommit,
   parseStageJson,
   release,
+  runRelease,
 } from "./publish.mjs";
+import { hasOpenReminder, reminderTitle } from "./reminders.mjs";
 
 const goodFiles = ["package.json", "README.md", "LICENSE", "bin/x.js"];
 
@@ -216,10 +218,8 @@ test("an open reminder means already staged, so it is not staged again", async (
 test("a version whose reminder issue was closed and is not on npm was rejected, so it is staged again", async () => {
   const root = workspace({ "a-axi": manifest("a-axi", "1.0.1"), "b-axi": manifest("b-axi", "1.0.0") });
   try {
-    const issues = [{ title: "Release waiting for your approval: a-axi 1.0.1", state: "closed" }];
-    const { ports, calls } = fakePorts({
-      hasOpenReminder: async (name, version) => issues.some((i) => i.state === "open" && i.title === `Release waiting for your approval: ${name} ${version}`),
-    });
+    const github = { listReminders: async () => [{ title: reminderTitle("a-axi", "1.0.1"), state: "closed" }] };
+    const { ports, calls } = fakePorts({ hasOpenReminder: (name, version) => hasOpenReminder(github, name, version) });
     const r = await release({ mode: "stage", root, ports, log: quiet });
     assert.equal(r.exitCode, 0);
     assert.deepEqual(calls.stage, ["/tmp/a-axi.tgz"]);
@@ -253,6 +253,27 @@ test("a ledger read failure on a later package keeps the packages already staged
     assert.deepEqual(calls.stage, ["/tmp/a-axi.tgz", "/tmp/c-axi.tgz"]);
     assert.deepEqual(r.staged.map((x) => x.name), ["a-axi", "c-axi"]);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("the staged list reaches GITHUB_OUTPUT even when the run fails", async () => {
+  const root = workspace({ "a-axi": manifest("a-axi", "1.0.1"), "b-axi": manifest("b-axi", "1.0.1") });
+  const out = mkdtempSync(join(tmpdir(), "axis-output-"));
+  const GITHUB_OUTPUT = join(out, "output");
+  try {
+    const { ports } = fakePorts({ stage: async (tarball) => { if (tarball.endsWith("b-axi.tgz")) throw new Error("boom"); return { stageId: "id-1" }; } });
+    assert.equal(await runRelease({ mode: "stage", root, ports, env: { GITHUB_OUTPUT }, log: quiet }), 1);
+    assert.equal(readFileSync(GITHUB_OUTPUT, "utf8"), `staged=${JSON.stringify([{ name: "a-axi", version: "1.0.1", stageId: "id-1" }])}\n`);
+  } finally { rmSync(root, { recursive: true, force: true }); rmSync(out, { recursive: true, force: true }); }
+});
+
+test("only stage mode writes GITHUB_OUTPUT", async () => {
+  const root = workspace({ "a-axi": manifest("a-axi", "1.0.1"), "b-axi": manifest("b-axi", "1.0.0") });
+  const out = mkdtempSync(join(tmpdir(), "axis-output-"));
+  const GITHUB_OUTPUT = join(out, "output");
+  try {
+    assert.equal(await runRelease({ mode: "check", root, ports: fakePorts().ports, env: { GITHUB_OUTPUT }, log: quiet }), 0);
+    assert.throws(() => readFileSync(GITHUB_OUTPUT), /ENOENT/);
+  } finally { rmSync(root, { recursive: true, force: true }); rmSync(out, { recursive: true, force: true }); }
 });
 
 test("private packages are ignored", async () => {

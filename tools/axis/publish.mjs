@@ -11,7 +11,7 @@ import { appendFileSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createGithub, reminderTitle } from "./reminders.mjs";
+import { createGithub, hasOpenReminder } from "./reminders.mjs";
 
 export const REPOSITORY_URL = "git+https://github.com/bytesbybrandon/axis.git";
 export const MIN_STAGE_NPM = "11.15.0";
@@ -185,8 +185,7 @@ function realPorts(root, tmp) {
     async hasOpenReminder(name, version) {
       const { GITHUB_TOKEN, GITHUB_REPOSITORY } = process.env;
       if (!GITHUB_TOKEN || !GITHUB_REPOSITORY) throw new Error("GITHUB_TOKEN and GITHUB_REPOSITORY are needed to read the reminder issues, which record what is already staged");
-      const title = reminderTitle(name, version);
-      return (await createGithub({ token: GITHUB_TOKEN, repo: GITHUB_REPOSITORY }).listReminders()).some((i) => i.title === title && i.state === "open");
+      return hasOpenReminder(createGithub({ token: GITHUB_TOKEN, repo: GITHUB_REPOSITORY }), name, version);
     },
     async stage(tarball) {
       const r = run("npm", ["stage", "publish", tarball, "--json"], { cwd: root });
@@ -212,14 +211,19 @@ function parseArgs(argv) {
   return opt;
 }
 
+// Runs the release and, in stage mode, always reports what was staged to the reminders job, even when the run fails.
+export async function runRelease({ mode, root, ports, env = process.env, log }) {
+  const result = await release({ mode, root, ports, log });
+  if (mode === "stage" && env.GITHUB_OUTPUT) appendFileSync(env.GITHUB_OUTPUT, `staged=${JSON.stringify(result.staged)}\n`);
+  return result.exitCode;
+}
+
 async function main() {
   const opt = parseArgs(process.argv.slice(2));
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   const tmp = mkdtempSync(join(tmpdir(), "axis-pack-"));
   try {
-    const result = await release({ ...opt, root, ports: realPorts(root, tmp) });
-    if (opt.mode === "stage" && process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `staged=${JSON.stringify(result.staged)}\n`);
-    process.exitCode = result.exitCode;
+    process.exitCode = await runRelease({ mode: opt.mode, root, ports: realPorts(root, tmp) });
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
