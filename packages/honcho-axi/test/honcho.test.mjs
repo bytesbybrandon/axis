@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { normalizeListData, runHoncho } from "../src/honcho.ts";
 
 const entrypoint = fileURLToPath(new URL("../bin/honcho-axi.js", import.meta.url));
+const { version: packageVersion } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 test("normalizes list arrays with a count and empty-state message", () => {
   assert.deepEqual(normalizeListData([]), {
@@ -47,5 +49,5 @@ test("local CLI exposes help and version without contacting Honcho", () => {
   assert.equal(help.status, 0, help.stderr);
   assert.match(help.stdout, /Commands: workspace, peer, session, message, conclusion/);
   assert.equal(version.status, 0, version.stderr);
-  assert.match(version.stdout, /^0\.1\.0\s*$/);
+  assert.equal(version.stdout.trim(), packageVersion);
 });

@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parseArguments, resolvePagesContext } from "../src/context.ts";
 import { repositoryContentsEndpoint } from "../src/github.ts";
 
 const entrypoint = fileURLToPath(new URL("../bin/pagescms-axi.js", import.meta.url));
+const { version: packageVersion } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 test("parses long, short, and inline repository options", () => {
   assert.deepEqual(parseArguments(["list", "-R", "owner/repo", "--branch=preview"]), {
@@ -46,5 +48,5 @@ test("local CLI exposes help and version without GitHub access", () => {
   assert.equal(help.status, 0, help.stderr);
   assert.match(help.stdout, /Commands: config, collection, content/);
   assert.equal(version.status, 0, version.stderr);
-  assert.match(version.stdout, /^0\.1\.0\s*$/);
+  assert.equal(version.stdout.trim(), packageVersion);
 });
