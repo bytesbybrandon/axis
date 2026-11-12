@@ -14,6 +14,17 @@ Merging to `main` publishes it to GitHub Pages through `.github/workflows/pages.
 
 Licenses are per package: each package directory carries its own `LICENSE`, and that file governs the package.
 The root `LICENSE` (MIT) covers the workspace tooling outside `packages/`.
+### Fastest way to use it
+
+Tell your agent: use `npx -y <tool>`, for example `npx -y tttui-axi`
+
+```bash
+npx -y tttui-axi status
+```
+
+Prints the current board, turn and available moves as compact TOON.
+Any published package runs the same way; each package's commands and options are documented in its README, linked in [Key Features](#key-features).
+
 ### Key Features
 
 * **[`tttui-axi`](packages/tttui-axi):** terminal tic-tac-toe with an interactive TUI and a compact TOON agent interface (`tttui`, `tttui-axi`, `ttt`), published as [`tttui-axi`](https://www.npmjs.com/package/tttui-axi) under MIT.
@@ -30,12 +41,13 @@ The root `LICENSE` (MIT) covers the workspace tooling outside `packages/`.
 
 ### Table of Contents
 
-1. [Getting Started](#getting-started)
-2. [Usage](#usage)
-3. [Running Tests](#running-tests)
-4. [Project Structure](#project-structure)
-5. [Contributing](#contributing)
-6. [License](#license)
+1. [Fastest way to use it](#fastest-way-to-use-it)
+2. [Getting Started](#getting-started) (manual install from a clone)
+3. [Usage](#usage)
+4. [Running Tests](#running-tests)
+5. [Project Structure](#project-structure)
+6. [Contributing](#contributing)
+7. [License](#license)
 
 ---
 
@@ -75,13 +87,7 @@ node packages/tttui-axi/bin/ttt.js --help
 Prints the `tttui-axi` command reference.
 Other packages expose their own binaries under `packages/<name>/bin/`.
 
-#### Code Example / API Reference
-
-Without cloning, run any published package with `npx`:
-
-```bash
-npx -y tttui-axi status
-```
+#### Site
 
 Site:
 
@@ -99,9 +105,6 @@ Each page gets a 1200 by 630 share card at `og/<name>.png`, drawn at build from 
 The site is private and needs Node.js 22.23.4 or later (Astro 7), so CI builds it on Node 24 only; the published packages still support 22.18.
 
 `verify:package` packs each package and checks the tarball: allowed files, no CR line endings, no spaces in paths, executable LF bins, the packed `LICENSE`, and an installed-tarball smoke run.
-Prints the current board, turn and available moves as compact TOON.
-Each package's commands and options are documented in its README, linked in [Key Features](#key-features).
-
 ---
 
 ### Running Tests
