@@ -58,6 +58,8 @@ next[3]:
   Run `tttui reset` to restart game
 ```
 
+The `next` lines name the linked `tttui` command; without `npm link`, run them as `npx -y tttui-axi <command>`.
+
 ---
 
 ## 🔧 Manual install

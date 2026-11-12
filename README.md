@@ -14,6 +14,7 @@ Merging to `main` publishes it to GitHub Pages through `.github/workflows/pages.
 
 Licenses are per package: each package directory carries its own `LICENSE`, and that file governs the package.
 The root `LICENSE` (MIT) covers the workspace tooling outside `packages/`.
+
 ### Fastest way to use it
 
 Tell your agent: use `npx -y <tool>`, for example `npx -y tttui-axi`
