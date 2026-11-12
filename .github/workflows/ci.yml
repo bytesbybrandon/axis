@@ -46,6 +46,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Test release tooling
+        run: pnpm test:tools
+
       # @axis/site is private and needs Node 22.23.4 or later (Astro 7), above the 22.18 floor the published packages support.
       - name: Build, test and verify affected packages
         if: github.event_name == 'pull_request'

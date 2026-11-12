@@ -5,3 +5,4 @@ Commit references such as `(#2)` in imported commit messages point at pull reque
 `reactive-skills-axi` had no source repository; it starts from its published 0.19.0 tarball.
 Release specs under `packages/*/docs/specs/` describe each package's former single-repository release process and are kept as history.
 Baseline tags (`<package>@<version>`) mark the commit each published version came from.
+The release workflow tags the latest published version of each package; see [Development](development.md#releasing).

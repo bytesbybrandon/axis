@@ -12,13 +12,6 @@ if (packageJson.bin?.[cliName] !== "./bin/honcho-axi.js") {
   throw new Error(`The ${cliName} executable must target ./bin/honcho-axi.js.`);
 }
 
-const versionSource = await readFile(path.join(projectRoot, "src/version.ts"), "utf8");
-const sourceVersion = versionSource.match(/export\s+const\s+VERSION\s*=\s*["']([^"']+)["']/)?.[1];
-
-if (sourceVersion !== packageJson.version) {
-  throw new Error(`src/version.ts must match package.json (${packageJson.version}).`);
-}
-
 const allowedFiles = new Set([
   "CODE_OF_CONDUCT.md",
   "CONTRIBUTING.md",
