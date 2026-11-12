@@ -1,64 +1,42 @@
 # tttui-axi (Terminal TUI Tic-Tac-Toe & AXI)
 
-A high-performance, cross-platform terminal (TUI) Tic-Tac-Toe game and **AXI (Agent eXperience Interface)** adhering to [axi.md](https://axi.md/). Written in modern Node.js (ESM) with zero runtime dependencies.
-
-Designed for instant interactive play by humans while waiting for LLM tasks, and token-optimized programmatic control by AI agents.
+A terminal (TUI) Tic-Tac-Toe game and **AXI (Agent eXperience Interface)** adhering to [axi.md](https://axi.md/), with a compact TOON interface for AI agents and an interactive TUI for humans.
 
 ![Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen) ![Node.js](https://img.shields.io/badge/Node.js-v18+-blue) ![Test](https://img.shields.io/badge/Tests-35%20Passing-success) ![AXI Compliant](https://img.shields.io/badge/AXI-Compliant-blueviolet)
 
+A high-performance, cross-platform terminal game written in modern Node.js (ESM) with zero runtime dependencies. It is designed for instant interactive play by humans while waiting for LLM tasks, and token-optimized programmatic control by AI agents.
+
 ---
 
-## ⚡ Instant Run (Zero Install via NPX)
+## ⚡ Fastest way to use it
 
-Run directly with zero manual installation:
+Tell your agent: use `npx -y tttui-axi`
 
 ```bash
 npx -y tttui-axi
 ```
 
-Or install/link globally:
-
-```bash
-npm link
-# Then launch anytime:
-tttui
-# (Aliases: tttui-axi, ttt)
-```
+Run directly with zero manual installation.
 
 ---
 
-## 🤖 AXI: Agent eXperience Interface ([axi.md](https://axi.md/))
-
-`tttui-axi` adheres to the **10 AXI design principles** for agent-ergonomic CLI design:
-
-1. **Token-efficient output**: Compact TOON format saves ~40% tokens compared to raw JSON.
-2. **Minimal default schemas**: Emits only actionable fields (`board`, `turn`, `game_state`, `available_moves`, `scores`).
-3. **Content truncation & escape hatch**: Concise summary by default; use `--json` or `--full` for raw data.
-4. **Pre-computed aggregates**: Eliminates round-trips by pre-calculating remaining available moves, winning triplets, and turn counters.
-5. **Definitive empty states**: Reports `available_moves: 0 (game finished)` rather than ambiguous empty collections.
-6. **Structured errors & exit codes**: Loud failures (exit code 1) on illegal moves or unknown flags; never hangs waiting for interactive input in AXI mode.
-7. **Ambient context**: Full integration guide in `AGENTS.md` and `docs/specs/0003-tttui-axi.md`.
-8. **Content first**: Running with no arguments in a terminal launches the interactive TUI; in non-TTY environments it displays live game state TOON.
-9. **Contextual disclosure**: Every response concludes with a `next[N]:` block containing runnable follow-up suggestions.
-10. **Consistent help**: Concise command reference via `tttui --help`.
-
-### Agent Command Reference
+## 🤖 Common tasks (agent commands)
 
 ```bash
 # View board status in TOON format
-tttui status
+npx -y tttui-axi status
 
 # Place a mark at grid cell 0-8
-tttui move 4
+npx -y tttui-axi move 4
 
 # Trigger AI opponent move (easy, medium, unbeatable)
-tttui ai unbeatable
+npx -y tttui-axi ai unbeatable
 
 # Reset board for next round
-tttui reset
+npx -y tttui-axi reset
 
 # Raw JSON escape hatch
-tttui status --json
+npx -y tttui-axi status --json
 ```
 
 Sample AXI TOON output:
@@ -80,9 +58,41 @@ next[3]:
   Run `tttui reset` to restart game
 ```
 
+The `next` lines name the linked `tttui` command; without `npm link`, run them as `npx -y tttui-axi <command>`.
+
 ---
 
-## 🎮 Interactive TUI Features (For Humans)
+## 🔧 Manual install
+
+Install/link globally:
+
+```bash
+npm link
+# Then launch anytime:
+tttui
+# (Aliases: tttui-axi, ttt)
+```
+
+---
+
+## 📚 Reference: AXI principles ([axi.md](https://axi.md/))
+
+`tttui-axi` adheres to the **10 AXI design principles** for agent-ergonomic CLI design:
+
+1. **Token-efficient output**: Compact TOON format saves ~40% tokens compared to raw JSON.
+2. **Minimal default schemas**: Emits only actionable fields (`board`, `turn`, `game_state`, `available_moves`, `scores`).
+3. **Content truncation & escape hatch**: Concise summary by default; use `--json` or `--full` for raw data.
+4. **Pre-computed aggregates**: Eliminates round-trips by pre-calculating remaining available moves, winning triplets, and turn counters.
+5. **Definitive empty states**: Reports `available_moves: 0 (game finished)` rather than ambiguous empty collections.
+6. **Structured errors & exit codes**: Loud failures (exit code 1) on illegal moves or unknown flags; never hangs waiting for interactive input in AXI mode.
+7. **Ambient context**: Full integration guide in `AGENTS.md` and `docs/specs/0003-tttui-axi.md`.
+8. **Content first**: Running with no arguments in a terminal launches the interactive TUI; in non-TTY environments it displays live game state TOON.
+9. **Contextual disclosure**: Every response concludes with a `next[N]:` block containing runnable follow-up suggestions.
+10. **Consistent help**: Concise command reference via `tttui --help`.
+
+---
+
+## 🎮 Reference: Interactive TUI Features (For Humans)
 
 <img width="609" height="616" alt="tttui-axi" src="https://github.com/user-attachments/assets/796bd364-3d49-4fcc-bd23-67679eb90685" />
 
