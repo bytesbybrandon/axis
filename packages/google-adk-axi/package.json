@@ -1,6 +1,6 @@
 {
   "name": "google-adk-axi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "List, inspect, and create local Google ADK Python projects",
   "author": "Brandon (bytesbybrandon)",
   "license": "MIT",

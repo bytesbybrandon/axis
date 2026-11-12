@@ -1,6 +1,6 @@
 {
   "name": "pagescms-axi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Agent-facing AXI for Pages CMS repositories",
   "author": "Brandon (bytesbybrandon)",
   "license": "MIT",

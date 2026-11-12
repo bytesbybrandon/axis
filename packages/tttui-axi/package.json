@@ -1,6 +1,6 @@
 {
   "name": "tttui-axi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Terminal TUI Tic-Tac-Toe and Agent eXperience Interface (AXI) adhering to axi.md",
   "type": "module",
   "main": "src/game.js",
