@@ -14,13 +14,13 @@ npx -y honcho-axi
 
 ## Common tasks
 
-Run `honcho-axi --help` to show the command list.
+Run `npx -y honcho-axi --help` to show the command list.
 
-Run `honcho-axi workspace list` to list workspaces.
+Run `npx -y honcho-axi workspace list` to list workspaces.
 
 Pass further Honcho arguments after the command name.
 
-For example, `honcho-axi peer search "product feedback" -w WORKSPACE_ID` searches a workspace.
+For example, `npx -y honcho-axi peer search "product feedback" -w WORKSPACE_ID` searches a workspace.
 
 ## Requirements
 

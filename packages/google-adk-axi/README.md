@@ -12,11 +12,11 @@ npx -y google-adk-axi
 
 ## Common tasks
 
-Run `google-adk-axi projects list [--root <path>]` to discover projects below the current directory or a selected root.
+Run `npx -y google-adk-axi projects list [--root <path>]` to discover projects below the current directory or a selected root.
 
-Run `google-adk-axi projects inspect <path>` to inspect any existing project directory.
+Run `npx -y google-adk-axi projects inspect <path>` to inspect any existing project directory.
 
-Run `google-adk-axi projects create <name> [--root <path>]` to create a new code project through the installed ADK CLI.
+Run `npx -y google-adk-axi projects create <name> [--root <path>]` to create a new code project through the installed ADK CLI.
 
 ## Requirements
 

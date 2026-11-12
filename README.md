@@ -89,8 +89,6 @@ Other packages expose their own binaries under `packages/<name>/bin/`.
 
 #### Site
 
-Site:
-
 ```sh
 pnpm --filter @axis/site dev                  # local preview at /axis/
 pnpm --filter @axis/site build                # static output in apps/site/dist
@@ -105,6 +103,7 @@ Each page gets a 1200 by 630 share card at `og/<name>.png`, drawn at build from 
 The site is private and needs Node.js 22.23.4 or later (Astro 7), so CI builds it on Node 24 only; the published packages still support 22.18.
 
 `verify:package` packs each package and checks the tarball: allowed files, no CR line endings, no spaces in paths, executable LF bins, the packed `LICENSE`, and an installed-tarball smoke run.
+
 ---
 
 ### Running Tests

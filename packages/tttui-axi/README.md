@@ -24,19 +24,19 @@ Run directly with zero manual installation.
 
 ```bash
 # View board status in TOON format
-tttui status
+npx -y tttui-axi status
 
 # Place a mark at grid cell 0-8
-tttui move 4
+npx -y tttui-axi move 4
 
 # Trigger AI opponent move (easy, medium, unbeatable)
-tttui ai unbeatable
+npx -y tttui-axi ai unbeatable
 
 # Reset board for next round
-tttui reset
+npx -y tttui-axi reset
 
 # Raw JSON escape hatch
-tttui status --json
+npx -y tttui-axi status --json
 ```
 
 Sample AXI TOON output:

@@ -16,11 +16,11 @@ npx -y pagescms-axi
 
 ## Common tasks
 
-Run `pagescms-axi --help` to show the command list.
+Run `npx -y pagescms-axi --help` to show the command list.
 
-Run `pagescms-axi collection list --repo OWNER/REPO` to list configured collections.
+Run `npx -y pagescms-axi collection list --repo OWNER/REPO` to list configured collections.
 
-Run `pagescms-axi content list --repo OWNER/REPO --collection posts` to list entries in a collection.
+Run `npx -y pagescms-axi content list --repo OWNER/REPO --collection posts` to list entries in a collection.
 
 Pass `--branch BRANCH` to select a branch.
 
