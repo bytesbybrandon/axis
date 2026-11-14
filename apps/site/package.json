@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/check-analytics.mjs",
     "preview": "astro preview",
     "capture": "node scripts/capture-home.mjs",
     "test": "node --test tests/*.test.ts"

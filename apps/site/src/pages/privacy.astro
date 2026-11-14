@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import analytics from '../analytics.config.json';
+import { href } from '../lib/site';
+
+const { host, domains } = analytics;
+---
+<Base
+  title="Privacy policy: axis"
+  description="What the axis site's page-view analytics collect."
+  path="privacy/"
+>
+  <section class="band">
+    <div class="container prose-wrap">
+      <p class="crumb"><a href={href()}>axis</a></p>
+      <div class="prose">
+        <h1>Privacy policy</h1>
+        <h2>Site analytics</h2>
+        <p>
+          axis counts page views with Umami, open-source analytics software that the site owner hosts. GitHub Pages cannot proxy the tracker, so
+          your browser loads the tracker script directly from
+          <code>{`${host}/script.js`}</code> and sends page-view data to that host. The data is
+          stored in a database the site owner controls, not at an analytics vendor. It is not used for advertising and is not sold.
+        </p>
+        <p>
+          Only visits on {domains.join(', ')} are counted, so localhost and other deployments are not. If your browser sends a Do Not Track
+          signal, the tracker does not send anything. Page views are not linked to a name, email address or account, because the site has none.
+        </p>
+        <ul>
+          <li>
+            Each page view records the page address (including any query string), the referrer, the page title, your browser and operating system,
+            device type, screen size, language, and an approximate location (country, region and city) looked up from your IP address
+          </li>
+          <li>Umami's documentation says your IP address is used for that lookup and is never stored by Umami</li>
+          <li>
+            The tracker sets no cookies and writes nothing to your browser storage, and Umami's documentation says visitors are not tracked across
+            websites
+          </li>
+          <li>
+            Repeat visits are counted using a hash of values such as your IP address and browser user agent combined with a salt that rotates
+            monthly by default, rather than a cookie or identifier stored on your device
+          </li>
+          <li>Self-hosted Umami keeps data until it is deleted and has no automatic expiry</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
