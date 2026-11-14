@@ -1,0 +1,10 @@
+---
+import analytics from '../analytics.config.json';
+
+// Self-hosted Umami page-view tracker, mounted once in the Base layout. GitHub Pages cannot proxy the
+// tracker, so the browser loads it from the Umami host directly. Page views only: no custom events, no
+// identify calls, no session recorder. data-domains restricts counting to the production hostname, so
+// localhost and previews are not counted, and data-do-not-track honors the browser's Do Not Track signal.
+const { host, websiteId, domains } = analytics;
+---
+<script defer is:inline src={`${host}/script.js`} data-website-id={websiteId} data-domains={domains.join(',')} data-do-not-track="true"></script>
