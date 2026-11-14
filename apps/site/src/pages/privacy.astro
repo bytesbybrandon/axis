@@ -1,6 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
+import analytics from '../analytics.config.json';
 import { href } from '../lib/site';
+
+const { host, domains } = analytics;
 ---
 <Base
   title="Privacy policy: axis"
@@ -16,11 +19,11 @@ import { href } from '../lib/site';
         <p>
           axis counts page views with Umami, open-source analytics software that the site owner hosts. GitHub Pages cannot proxy the tracker, so
           your browser loads the tracker script directly from
-          <span class="break-all">https://umami-production-abb4.up.railway.app/script.js</span> and sends page-view data to that host. The data is
+          <span class="break-all">{`${host}/script.js`}</span> and sends page-view data to that host. The data is
           stored in a database the site owner controls, not at an analytics vendor. It is not used for advertising and is not sold.
         </p>
         <p>
-          Only visits on bytesbybrandon.github.io are counted, so localhost and other deployments are not. If your browser sends a Do Not Track
+          Only visits on {domains.join(', ')} are counted, so localhost and other deployments are not. If your browser sends a Do Not Track
           signal, the tracker does not send anything. Page views are not linked to a name, email address or account, because the site has none.
         </p>
         <ul>
