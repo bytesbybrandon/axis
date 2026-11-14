@@ -1,11 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
-import { REPO } from '../lib/catalog';
 import { href } from '../lib/site';
 ---
 <Base
   title="Privacy policy: axis"
-  description="What the axis site and its page-view analytics collect, and what they do not."
+  description="What the axis site's page-view analytics collect."
   path="privacy/"
 >
   <section class="band">
@@ -13,17 +12,6 @@ import { href } from '../lib/site';
       <p class="crumb"><a href={href()}>axis</a></p>
       <div class="prose">
         <h1>Privacy policy</h1>
-        <p>
-          This page explains what the axis site collects when you visit it, and what it does not. axis is a public catalog of Agent eXperience
-          Interfaces by bytesbybrandon, served from <a href={href()}>bytesbybrandon.github.io/axis</a>.
-        </p>
-
-        <h2>Information we collect</h2>
-        <p>
-          The site has no accounts, no forms and no sign-in, and it asks for no name, email address or other personal details. The only visitor
-          data comes from the page-view analytics described below, plus the routine request logs kept by GitHub Pages, which serves the site.
-        </p>
-
         <h2>Site analytics</h2>
         <p>
           axis counts page views with Umami, open-source analytics software that the site owner hosts. GitHub Pages cannot proxy the tracker, so
@@ -40,10 +28,7 @@ import { href } from '../lib/site';
             Each page view records the page address (including any query string), the referrer, the page title, your browser and operating system,
             device type, screen size, language, and an approximate location (country, region and city) looked up from your IP address
           </li>
-          <li>
-            Umami's documentation says your IP address is used for that lookup and is never stored by Umami; GitHub Pages may still log it in
-            routine request logs, as described above
-          </li>
+          <li>Umami's documentation says your IP address is used for that lookup and is never stored by Umami</li>
           <li>
             The tracker sets no cookies and writes nothing to your browser storage, and Umami's documentation says visitors are not tracked across
             websites
@@ -54,18 +39,6 @@ import { href } from '../lib/site';
           </li>
           <li>Self-hosted Umami keeps data until it is deleted and has no automatic expiry</li>
         </ul>
-
-        <h2>What we do not do</h2>
-        <p>
-          The site sets no cookies, runs no advertising tracker or session recorder, and shows no consent banner because there is nothing to consent
-          to. Nothing collected here is sold or shared for advertising.
-        </p>
-
-        <h2>Changes to this policy</h2>
-        <p>This policy changes only when the site's data handling changes. The version on this page is the current one.</p>
-
-        <h2>Contact</h2>
-        <p>Questions about this policy or how the site handles data belong in an issue at <a href={REPO}>{REPO}</a>.</p>
       </div>
     </div>
   </section>
