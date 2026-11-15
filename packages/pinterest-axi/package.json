@@ -1,6 +1,7 @@
 {
   "name": "pinterest-axi",
   "version": "0.1.0",
+  "private": true,
   "description": "Agent-facing AXI and MCP server for the Pinterest API (read-only)",
   "author": "Brandon (bytesbybrandon)",
   "license": "MIT",

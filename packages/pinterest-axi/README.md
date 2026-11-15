@@ -4,6 +4,8 @@ Pinterest AXI reads your Pinterest account, boards and pins through the official
 
 This first version is read-only. It has not been published to npm yet; run it from a checkout.
 
+The package is marked `private` until npm trusted publishing is set up for it, so the release workflow skips it.
+
 ## Fastest way to use it
 
 Tell your agent: use `npx -y pinterest-axi` (once published).
