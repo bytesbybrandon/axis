@@ -1,0 +1,49 @@
+{
+  "name": "research-axi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local literature discovery, bounded PDF reading and pinned citations over AXI and MCP",
+  "author": "Brandon (bytesbybrandon)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bytesbybrandon/axis.git",
+    "directory": "packages/research-axi"
+  },
+  "homepage": "https://github.com/bytesbybrandon/axis/tree/main/packages/research-axi#readme",
+  "bugs": {
+    "url": "https://github.com/bytesbybrandon/axis/issues"
+  },
+  "scripts": {
+    "axi": "node ./bin/research-axi.js",
+    "build": "tsc --noEmit --project tsconfig.json && node scripts/build-skill.ts --check",
+    "build:runtime": "tsc --project tsconfig.build.json",
+    "test": "npm run build:runtime && node --test test/*.test.mjs",
+    "verify:package": "npm run build:runtime && node ../../tools/axis/verify-tarball.mjs && node scripts/smoke.mjs",
+    "build:skill": "node scripts/build-skill.ts"
+  },
+  "type": "module",
+  "files": [
+    "bin/research-axi.js",
+    "dist/*.js",
+    "skills/research-axi/SKILL.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "research-axi": "./bin/research-axi.js"
+  },
+  "dependencies": {
+    "@toon-format/toon": "^4.1.1",
+    "axi-sdk-js": "^0.1.12",
+    "fast-xml-parser": "^5.0.8",
+    "unpdf": "1.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

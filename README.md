@@ -33,6 +33,7 @@ Any published package runs the same way; each package's commands and options are
 * **[`honcho-axi`](packages/honcho-axi):** agent-facing interface for Honcho (`honcho-axi`), published as [`honcho-axi`](https://www.npmjs.com/package/honcho-axi) under MIT.
 * **[`pagescms-axi`](packages/pagescms-axi):** agent-facing interface for Pages CMS repositories (`pagescms-axi`), published as [`pagescms-axi`](https://www.npmjs.com/package/pagescms-axi) under MIT.
 * **[`pinterest-axi`](packages/pinterest-axi):** read-only Pinterest boards and pins as an AXI CLI and an MCP server (`pinterest-axi`), not yet published to npm, under MIT.
+* **[`research-axi`](packages/research-axi):** local arXiv/OpenAlex discovery, bounded PDF passages and version-pinned citations through AXI and MCP (`research-axi`); private and not published to npm, under MIT.
 * **[`reactive-skills-axi`](packages/reactive-skills-axi):** alias that runs `@reactive-skills/axi` (`reactive-skills-axi`), published as [`reactive-skills-axi`](https://www.npmjs.com/package/reactive-skills-axi) under AGPL-3.0-only.
 
 ### Tech Stack
