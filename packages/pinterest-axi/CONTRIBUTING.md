@@ -6,7 +6,7 @@ Thanks for helping improve Pinterest AXI.
 
 Use Node.js 22.18 or later.
 
-Run `npm ci` to install the locked dependencies.
+Run `pnpm install --frozen-lockfile` from the repository root to install the locked dependencies.
 
 Run `npm run build` to type-check the source and verify the generated skill pointer.
 

@@ -4,7 +4,7 @@ Run these checks from the project directory with Node.js 22.18 or later.
 
 ## Build and automated checks
 
-- Run `npm ci` and confirm installation completes without errors.
+- Run `pnpm install --frozen-lockfile` from the repository root and confirm installation completes without errors.
 - Run `npm test` and confirm the local suite passes without Pinterest credentials.
 - Run `npm run build:skill -- --check` and confirm the skill pointer is current.
 
