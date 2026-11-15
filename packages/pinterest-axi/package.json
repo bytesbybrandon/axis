@@ -1,0 +1,53 @@
+{
+  "name": "pinterest-axi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent-facing AXI and MCP server for the Pinterest API (read-only)",
+  "author": "Brandon (bytesbybrandon)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bytesbybrandon/axis.git",
+    "directory": "packages/pinterest-axi"
+  },
+  "homepage": "https://github.com/bytesbybrandon/axis/tree/main/packages/pinterest-axi#readme",
+  "bugs": {
+    "url": "https://github.com/bytesbybrandon/axis/issues"
+  },
+  "scripts": {
+    "axi": "node \"./bin/pinterest-axi.js\"",
+    "build": "tsc --noEmit --project tsconfig.json && node ./scripts/build-skill.ts --check",
+    "build:runtime": "tsc --project tsconfig.build.json",
+    "build:skill": "node ./scripts/build-skill.ts",
+    "verify:package": "npm run build:runtime && node ./scripts/verify-package.mjs && node ../../tools/axis/verify-tarball.mjs",
+    "test": "npm run build && npm run build:runtime && node --test"
+  },
+  "type": "module",
+  "files": [
+    "bin/pinterest-axi.js",
+    "dist/cli.js",
+    "dist/mcp.js",
+    "dist/operations.js",
+    "dist/pinterest.js",
+    "dist/version.js",
+    "skills/pinterest-axi/SKILL.md",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "pinterest-axi": "./bin/pinterest-axi.js"
+  },
+  "dependencies": {
+    "@toon-format/toon": "^4.1.1",
+    "axi-sdk-js": "^0.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
