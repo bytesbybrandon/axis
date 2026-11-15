@@ -32,6 +32,7 @@ Any published package runs the same way; each package's commands and options are
 * **[`google-adk-axi`](packages/google-adk-axi):** list, inspect and create local Google ADK Python projects (`google-adk-axi`), published as [`google-adk-axi`](https://www.npmjs.com/package/google-adk-axi) under MIT.
 * **[`honcho-axi`](packages/honcho-axi):** agent-facing interface for Honcho (`honcho-axi`), published as [`honcho-axi`](https://www.npmjs.com/package/honcho-axi) under MIT.
 * **[`pagescms-axi`](packages/pagescms-axi):** agent-facing interface for Pages CMS repositories (`pagescms-axi`), published as [`pagescms-axi`](https://www.npmjs.com/package/pagescms-axi) under MIT.
+* **[`pinterest-axi`](packages/pinterest-axi):** read-only Pinterest boards and pins as an AXI CLI and an MCP server (`pinterest-axi`), not yet published to npm, under MIT.
 * **[`reactive-skills-axi`](packages/reactive-skills-axi):** alias that runs `@reactive-skills/axi` (`reactive-skills-axi`), published as [`reactive-skills-axi`](https://www.npmjs.com/package/reactive-skills-axi) under AGPL-3.0-only.
 
 ### Tech Stack
@@ -132,6 +133,7 @@ Other commands, including affected-only runs and the `verify:package` checks, ar
 │   ├── google-adk-axi/      Google ADK project AXI (bin, src, test, docs, skills)
 │   ├── honcho-axi/          Honcho AXI (bin, src, test, docs, skills)
 │   ├── pagescms-axi/        Pages CMS AXI (bin, src, test, docs, skills)
+│   ├── pinterest-axi/       Pinterest AXI and MCP server (bin, src, test, docs, skills)
 │   ├── reactive-skills-axi/ Alias that runs @reactive-skills/axi (bin, test)
 │   └── tttui-axi/           Terminal tic-tac-toe AXI (bin, src, test, docs)
 ├── tools/axis/              Tarball verifier used by every package's verify:package, and the release tooling
