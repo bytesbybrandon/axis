@@ -4,6 +4,7 @@ import '@fontsource-variable/hanken-grotesk';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/site.css';
 import Nav from '../components/Nav.astro';
+import Analytics from '../components/Analytics.astro';
 import Footer from '../components/Footer.astro';
 import Palette from '../components/Palette.astro';
 import { absolute, href } from '../lib/site';
@@ -42,6 +43,7 @@ const canonical = absolute(path, Astro.site);
     <meta name="twitter:image" content={card} />
     <meta name="theme-color" content="#f88a2f" />
     <script is:inline>document.documentElement.classList.add('js');</script>
+    <Analytics />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
